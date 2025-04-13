@@ -19,9 +19,15 @@ st.header('System Issues')
 # You can access the session state to make a more customized/personalized app experience
 st.write(f"### Hi, {st.session_state['first_name']}.")
 
+if st.button('Update Issue', 
+             type='primary',
+             use_container_width=True):
+  st.switch_page('pages/update_issue.py')
+
 
 users = requests.get('http://api:4000/i/issues').json()
 try:
   st.dataframe(users)
 except:
   st.write("could not connect to databade to get users!")
+

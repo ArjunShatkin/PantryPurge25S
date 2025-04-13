@@ -5,15 +5,15 @@ import requests
 
 SideBarLinks()
 
-st.write("# Update User")
+st.write("# Update Issue")
 
 
 
-users = requests.get('http://api:4000/u/users/<datecreated>').json()
+users = requests.put('http://api:4000/u/users').json()
 try:
   st.dataframe(users)
 except:
   st.write("could not connect to databade to get users!")
 
+# add a place to enter the updated information 
 
-# add a bar chart that shows the display of the table 
