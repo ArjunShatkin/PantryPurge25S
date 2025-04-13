@@ -1,18 +1,26 @@
 import streamlit as st
 from streamlit_extras.app_logo import add_logo
 from modules.nav import SideBarLinks
+import requests
 
 SideBarLinks()
 
-st.write("# About this App")
+st.write("# All Users")
 
-st.markdown (
-    """
-    This is a demo app for CS 3200 Course Project.  
+if st.button('Update User', 
+             type='primary',
+             use_container_width=True):
+  st.switch_page('pages/update_user.py')
 
-    The goal of this demo is to provide information on the tech stack 
-    being used as well as demo some of the features of the various platforms. 
+if st.button('User Analysis', 
+             type='primary',
+             use_container_width=True):
+  st.switch_page('pages/user_analysis.py')
 
-    Stay tuned for more information and features to come!
-    """
-        )
+users = requests.get('http://api:4000/u/users').json()
+try:
+  st.dataframe(users)
+except:
+  st.write("could not connect to databade to get users!")
+
+

@@ -8,12 +8,12 @@ from backend.db_connection import db
 #------------------------------------------------------------
 # Create a new Blueprint object, which is a collection of 
 # routes.
-users = Blueprint('user', __name__)
+users = Blueprint('users', __name__)
 
 
 # Get all the products from the database, package them up,
 # and return them to the client
-@user_accounts.route('/user_accounts', methods=['GET'])
+@users.route('/users', methods=['GET'])
 def get_all_users():
 
     cursor = db.get_db().cursor()
@@ -36,22 +36,43 @@ def get_all_users():
     response.mimetype = 'application/json'
     response.status_code = 200
     return response
-    
 
-# Update customer info for customer with particular userID
-#   Notice the manner of constructing the query.
-@user_accounts.route('/user_accounts', methods=['PUT'])
+@users.route('/users', methods=['PUT'])
 def update_user():
-    current_app.logger.info('PUT /user route')
-    cust_info = request.json
-    cust_id = cust_info['id']
-    username = cust_info['username']
-    created = cust_info['datecreated']
-    Status = cust_info['userstatus']
+    current_app.logger.info('PUT /users route')
+    user_info = request.json
+    user_id = user_info['UserId']
+    user_name = user_info['Username']
+    created = user_info['datecreated']
+    status = user_info['UserStatus']
 
-    query = 'UPDATE customers SET username = %s, datecreated = %s, userstatus = %s where id = %s'
-    data = (username, created,Status)
+    query = 'UPDATE users SET user_name = %s,  status = %s where id = %s'
+    data = (user_name, status, user_id)
     cursor = db.get_db().cursor()
     r = cursor.execute(query, data)
     db.get_db().commit()
-    return 'user updated'
+    return 'user updated!'
+
+@users.route('/users/<datecreated>', methods=['GET'])
+def creation_date_count():
+
+    cursor = db.get_db().cursor()
+    
+    query = '''
+        Select month(datecreated) as month, Count(*)
+        from User
+        group by month(DateCreated)
+    '''
+    
+    # Same process as above
+    
+    cursor.execute(query)
+    theData = cursor.fetchall()
+
+    
+    response = make_response(theData)
+    response.mimetype = 'application/json'
+    response.status_code = 200
+    return response
+    
+
