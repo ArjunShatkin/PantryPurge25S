@@ -12,40 +12,28 @@ recipes = Blueprint('recipes', __name__)
 
 @recipes.route('/recipes', methods=['POST'])
 def create_recipe():
-    # Get the JSON data from the request body
-    data = request.json
-    
-    # Extracting the fields from the request data
-    recipe_name = data.get('RecipeName')
-    servings = data.get('Servings')
-    difficulty = data.get('Difficulty')
-    calories = data.get('Calories')
-    description = data.get('Description')
-    cuisine = data.get('Cuisine')
-    prep_time_mins = data.get('PrepTimeMins')
-    cook_time_mins = data.get('CookTimeMins')
-    publish_date = data.get('PublishDate')
-    
-    # Validating the required fields (e.g., RecipeName must be present)
-    if not recipe_name or not chef_id:
-        return jsonify({"error": "RecipeName and chef_id are required."}), 400
+    current_app.logger.info('POST /recipes route')
 
-    # Optional fields should be handled carefully if missing, so we provide defaults if necessary
-    servings = servings if servings is not None else 4
-    difficulty = difficulty if difficulty else 'Medium'
-    calories = calories if calories is not None else 0
-    description = description if description else ''
-    cuisine = cuisine if cuisine else 'General'
-    prep_time_mins = prep_time_mins if prep_time_mins is not None else 30
-    cook_time_mins = cook_time_mins if cook_time_mins is not None else 45
-    publish_date = publish_date if publish_date else '2025-01-01'
+    data = request.json
+
+    recipe_name = data.get('RecipeName')
+    servings = data.get('Servings', 4)
+    difficulty = data.get('Difficulty', 'Medium')
+    calories = data.get('Calories', 0)
+    description = data.get('Description', '')
+    cuisine = data.get('Cuisine', 'General')
+    prep_time_mins = data.get('PrepTimeMins', 30)
+    cook_time_mins = data.get('CookTimeMins', 45)
+    publish_date = data.get('PublishDate', '2025-01-01')
+
+    # Required field validation
+    if not recipe_name:
+        return jsonify({"error": "RecipeName is required."}), 400
 
     try:
-        cursor = db.cursor()
+        cursor = db.get_db().cursor()
 
-        # Insert the recipe into the database with the provided fields
-        cursor.execute(
-            """
+        query = '''
             INSERT INTO recipes (
                 RecipeName, Servings, Difficulty, Calories, 
                 Description, Cuisine, PrepTimeMins, CookTimeMins, 
@@ -53,33 +41,33 @@ def create_recipe():
             )
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
             RETURNING RecipeID;
-            """,
-            (recipe_name, servings, difficulty, calories, description, cuisine, 
-             prep_time_mins, cook_time_mins, publish_date)
+        '''
+        values = (
+            recipe_name, servings, difficulty, calories,
+            description, cuisine, prep_time_mins, cook_time_mins, publish_date
         )
-        
-        # Fetch the newly created RecipeID
+
+        cursor.execute(query, values)
         new_id = cursor.fetchone()[0]
+        db.get_db().commit()
 
-        db.commit()
-        cursor.close()
-
-        # Respond with a success message and the ID of the newly created recipe
         return jsonify({
             "message": "Recipe created successfully.",
             "recipe_id": new_id
         }), 201
 
     except Exception as e:
-        db.rollback()
+        db.get_db().rollback()
         return jsonify({"error": str(e)}), 500
+
 
 @recipes.route('/recipes/<int:recipe_id>', methods=['PUT'])
 def update_recipe(recipe_id):
-    # Get the incoming JSON data
+    current_app.logger.info(f'PUT /recipes/{recipe_id} route')
+
     data = request.json
 
-    # Extract the fields from the request data
+    # Extract fields from request
     recipe_name = data.get('RecipeName')
     servings = data.get('Servings')
     difficulty = data.get('Difficulty')
@@ -90,17 +78,17 @@ def update_recipe(recipe_id):
     cook_time_mins = data.get('CookTimeMins')
     publish_date = data.get('PublishDate')
 
-    # Check if no fields were provided for update
+    # Validate: at least one field must be provided
     if not any([recipe_name, servings, difficulty, calories, description, cuisine, prep_time_mins, cook_time_mins, publish_date]):
         return jsonify({"error": "No fields to update"}), 400
 
     try:
-        cursor = db.cursor()
+        cursor = db.get_db().cursor()
 
-        # Build the SET part of the SQL query dynamically based on provided fields
+        # Dynamically build update query
         fields = []
         values = []
-        
+
         if recipe_name:
             fields.append("RecipeName = %s")
             values.append(recipe_name)
@@ -129,24 +117,16 @@ def update_recipe(recipe_id):
             fields.append("PublishDate = %s")
             values.append(publish_date)
 
-        # Add the recipe_id as the final value for the WHERE clause
         values.append(recipe_id)
+        query = f"UPDATE recipes SET {', '.join(fields)} WHERE RecipeID = %s"
 
-        # Dynamically build the SQL UPDATE statement
-        sql = f"UPDATE recipes SET {', '.join(fields)} WHERE RecipeID = %s"
+        cursor.execute(query, tuple(values))
+        db.get_db().commit()
 
-        # Execute the update query
-        cursor.execute(sql, tuple(values))
-
-        # Commit the changes to the database
-        db.commit()
-        cursor.close()
-
-        # Return a success response
-        return jsonify({"message": "Recipe updated successfully."}), 200
+        return 'Recipe updated successfully.', 200
 
     except Exception as e:
-        db.rollback()
+        db.get_db().rollback()
         return jsonify({"error": str(e)}), 500
 
 # This blueprint will handle routes related to Newsletter submissions
@@ -159,39 +139,30 @@ newsletter_routes = Blueprint('newsletter_routes', __name__)
 
 @recipe_routes.route('/recipes/<int:recipe_id>/newsletter', methods=['POST'])
 def submit_recipe_for_newsletter(recipe_id):
-    # Get the incoming JSON data
+    current_app.logger.info(f'POST /recipes/{recipe_id}/newsletter route')
+
     data = request.json
-
-    # Extracting the ChefID and SubStatus from the request data
     chef_id = data.get('ChefID')
-    sub_status = data.get('SubStatus', 'Pending')  # Default status is 'Pending'
-    sub_date = datetime.now()  # Set the current time for submission date
+    sub_status = data.get('SubStatus', 'Pending')
+    sub_date = datetime.now()
 
-    # Validation: Ensure ChefID is provided
     if not chef_id:
         return jsonify({"error": "ChefID is required."}), 400
 
     try:
-        cursor = db.cursor()
+        cursor = db.get_db().cursor()
 
-        # Insert the recipe submission into the Newsletter table
-        cursor.execute(
-            """
+        query = '''
             INSERT INTO Newsletter (ChefID, RecipeID, SubStatus, SubDate)
             VALUES (%s, %s, %s, %s)
             RETURNING SubID;
-            """,
-            (chef_id, recipe_id, sub_status, sub_date)
-        )
-
-        # Fetch the newly created SubID
+        '''
+        values = (chef_id, recipe_id, sub_status, sub_date)
+        cursor.execute(query, values)
         sub_id = cursor.fetchone()[0]
 
-        # Commit the changes to the database
-        db.commit()
-        cursor.close()
+        db.get_db().commit()
 
-        # Return a success message along with the SubID of the submission
         return jsonify({
             "message": "Recipe submission to newsletter successful.",
             "SubID": sub_id,
@@ -202,5 +173,41 @@ def submit_recipe_for_newsletter(recipe_id):
         }), 201
 
     except Exception as e:
-        db.rollback()
+        db.get_db().rollback()
+        return jsonify({"error": str(e)}), 500
+
+
+@chef_routes.route('/chefs/<int:chef_id>/region', methods=['GET'])
+def get_chefs_in_same_state(chef_id):
+    current_app.logger.info(f'GET /chefs/{chef_id}/region route')
+
+    try:
+        cursor = db.get_db().cursor()
+
+        # Step 1: Get the state of the current chef
+        cursor.execute("SELECT StateName FROM Chef WHERE ChefID = %s", (chef_id,))
+        result = cursor.fetchone()
+
+        if not result or not result[0]:
+            return jsonify({"error": "Chef not found or state information missing"}), 404
+
+        state = result[0]
+
+        # Step 2: Find other chefs in the same state (excluding the current chef)
+        query = """
+            SELECT ChefID, FirstName, LastName, CuisineSpecialty, YearsExp, City, StateName, Country
+            FROM Chef
+            WHERE StateName = %s AND ChefID != %s;
+        """
+        cursor.execute(query, (state, chef_id))
+        chefs = cursor.fetchall()
+
+        # Step 3: Format the result as JSON
+        columns = [desc[0] for desc in cursor.description]
+        chef_list = [dict(zip(columns, row)) for row in chefs]
+
+        return jsonify(chef_list), 200
+
+    except Exception as e:
+        db.get_db().rollback()
         return jsonify({"error": str(e)}), 500
