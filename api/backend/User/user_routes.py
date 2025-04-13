@@ -55,3 +55,36 @@ def update_user():
     r = cursor.execute(query, data)
     db.get_db().commit()
     return 'user updated'
+
+@chef_routes.route('/chefs/<int:chef_id>/recipes/performance', methods=['GET'])
+def get_chef_recipes_performance(chef_id):
+    current_app.logger.info(f'GET /chefs/{chef_id}/recipes/performance route')
+
+    try:
+        cursor = db.get_db().cursor()
+
+        # Query for all recipes by this chef and their performance metrics
+        query = """
+            SELECT 
+                RecipeID, 
+                RecipeName, 
+                PublishDate, 
+                NumViews, 
+                NumShares, 
+                NumReviews
+            FROM Recipe
+            WHERE ChefID = %s
+            ORDER BY PublishDate DESC;
+        """
+        cursor.execute(query, (chef_id,))
+        recipes = cursor.fetchall()
+
+        columns = [desc[0] for desc in cursor.description]
+        recipe_list = [dict(zip(columns, row)) for row in recipes]
+
+        return jsonify(recipe_list), 200
+
+    except Exception as e:
+        db.get_db().rollback()
+        return jsonify({"error": str(e)}), 500
+
