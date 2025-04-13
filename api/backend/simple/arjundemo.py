@@ -6,6 +6,7 @@ from flask import current_app
 from backend.db_connection import db
 
 recipes = Blueprint('recipes', __name__)
+chefs = Blueprint('chefs', __name__)
 
 # ------------------------------------------------------------
 # POST /recipes - Create and publish a new recipe
@@ -137,7 +138,7 @@ newsletter_routes = Blueprint('newsletter_routes', __name__)
 # ------------------------------------------------------------
 # /recipes/<id>/newsletter: Submit a recipe for the newsletter
 
-@recipe_routes.route('/recipes/<int:recipe_id>/newsletter', methods=['POST'])
+@recipes.route('/recipes/<int:recipe_id>/newsletter', methods=['POST'])
 def submit_recipe_for_newsletter(recipe_id):
     current_app.logger.info(f'POST /recipes/{recipe_id}/newsletter route')
 
@@ -177,7 +178,7 @@ def submit_recipe_for_newsletter(recipe_id):
         return jsonify({"error": str(e)}), 500
 
 
-@chef_routes.route('/chefs/<int:chef_id>/region', methods=['GET'])
+@chefs.route('/chefs/<int:chef_id>/region', methods=['GET'])
 def get_chefs_in_same_state(chef_id):
     current_app.logger.info(f'GET /chefs/{chef_id}/region route')
 
