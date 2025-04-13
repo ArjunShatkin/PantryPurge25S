@@ -45,7 +45,7 @@ def create_app():
     app.register_blueprint(users, url_prefix ='/u')
     app.register_blueprint(customers,   url_prefix='/c')
     app.register_blueprint(products,    url_prefix='/p')
-    app.register_blueprint(recipe, url_prefix='/r')
+    app.register_blueprint(recipes, url_prefix='/r')
 
     # Don't forget to return the app object
     return app
