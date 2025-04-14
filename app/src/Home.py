@@ -78,7 +78,7 @@ if st.button('Act as Jane, System Administrator',
             use_container_width=True):
     st.session_state['authenticated'] = True
     st.session_state['role'] = 'administrator'
-    st.session_state['first_name'] = 'SysAdmin'
+    st.session_state['first_name'] = 'Jane- System Admin'
     st.switch_page('pages/system_admin_home.py')
 
 

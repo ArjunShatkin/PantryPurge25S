@@ -9,7 +9,7 @@ from backend.db_connection import db
 # Create a new Blueprint object, which is a collection of 
 # routes.
 users = Blueprint('users', __name__)
-
+issues = Blueprint('issues', __name__)
 
 # Get all the products from the database, package them up,
 # and return them to the client
@@ -76,4 +76,25 @@ def creation_date_count():
     response.status_code = 200
     return response
     
+@issues.route('/issue/', methods=['GET'])
+def get_all_issues():
+
+    cursor = db.get_db().cursor()
+    
+    query = '''
+        Select month(datecreated) as month, Count(*)
+        from User
+        group by month(DateCreated)
+    '''
+    
+    # Same process as above
+    
+    cursor.execute(query)
+    theData = cursor.fetchall()
+
+    
+    response = make_response(theData)
+    response.mimetype = 'application/json'
+    response.status_code = 200
+    return response
 

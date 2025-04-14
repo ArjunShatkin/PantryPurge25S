@@ -38,7 +38,7 @@ def ApiTestNav():
 
 def PredictionNav():
     st.sidebar.page_link(
-        "pages/11_Prediction_Test.py", label="Regression Prediction", icon="📈"
+        "pages/11_Prediction_Test.py", label="Regression Prediction", icon="🏦"
     )
 
 
@@ -98,6 +98,7 @@ def SideBarLinks(show_home=False):
         # If the user is an administrator, give them access to the administrator pages
         if st.session_state["role"] == "administrator":
             AdminPageNav()
+            
 
         if st.session_state["role"] == "casual_cook":
             CCPageNav()
