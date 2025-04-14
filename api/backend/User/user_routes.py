@@ -82,9 +82,8 @@ def get_all_issues():
     cursor = db.get_db().cursor()
     
     query = '''
-        Select month(datecreated) as month, Count(*)
-        from User
-        group by month(DateCreated)
+        Select  IssueID, UserID, EnteredTime, Priority, Status, Title, Description, ResolvedDate
+        From issue
     '''
     
     # Same process as above
@@ -97,4 +96,58 @@ def get_all_issues():
     response.mimetype = 'application/json'
     response.status_code = 200
     return response
+
+@issues.route('/issues', methods = ['POST'])
+def add_new_issue():
+    the_data = request.json 
+    current_app.logger.info(the_data)
+
+    issue_id = the_data['IssueID']
+    user = the_data['UserID']
+    time = the_data ['EnteredTime']
+    Priority = the_data ['Priority']
+    Status = the_data ['Status']
+    Title = the_data ['Title']
+    Description = the_data ['Description']
+    Resolved = the_data ['ResolvedDate']
+
+    query = f'''
+        INSERT INTO products (IssueID, UserID, EnteredTime, Priority, Status, Title, Description, ResolvedDate)
+        VALUES ('{issue_id}','{user}', '{time}', '{Priority}','{Status}', '{Title}', '{Description}','{Resolved}')
+    '''
+    # TODO: Make sure the version of the query above works properly
+    # Constructing the query
+    # query = 'insert into products (product_name, description, category, list_price) values ("'
+    # query += name + '", "'
+    # query += description + '", "'
+    # query += category + '", '
+    # query += str(price) + ')'
+    current_app.logger.info(query)
+
+    # executing and committing the insert statement 
+    cursor = db.get_db().cursor()
+    cursor.execute(query)
+    db.get_db().commit()
+    
+    response = make_response("Successfully added issue")
+    response.status_code = 200
+    return response
+
+
+@issues.route('/issues', methods = ['Delete'])
+def delete_issue():
+    current_app.logger.info('Delete/issue')
+    issue_info = request.json
+    issue_id = issue_info['issueId']
+    
+
+    query = 'Delete Issue where issueid = %s'
+    
+    cursor = db.get_db().cursor()
+    cursor.execute(query)
+    
+    return 'user updated'
+
+
+
 
