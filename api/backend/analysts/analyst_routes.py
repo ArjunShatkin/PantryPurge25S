@@ -44,7 +44,7 @@ ORDER BY COUNT(S.SearchID) DESC
 def get_searches():
     current_app.logger.info('GET /search/dietrestrict route')
     search_info = request.json
-    days = search_info['days']
+    days = search_info.get('days', 30)
 
     query = f'''SELECT D.RestName, Count(S.SearchID) as PastWeekSearches
 FROM DietaryRestrictions D
@@ -68,7 +68,7 @@ ORDER BY COUNT(S.SearchID) DESC
 def get_searches():
     current_app.logger.info('GET /search/ingredients route')
     search_info = request.json
-    days = search_info['days']
+    days = search_info.get('days', 30)
 
     query = f'''SELECT I.IngredientName, Count(S.SearchID) as PastWeekSearches
 FROM Ingredients I
@@ -87,18 +87,65 @@ ORDER BY COUNT(S.SearchID) DESC
     the_response.status_code = 200
     return the_response
 
-#------------------------------------------------------------
-# Makes use of the very simple ML model in to predict a value
-# and returns it to the user
-@analysts.route('/prediction/<var01>/<var02>', methods=['GET'])
-def predict_value(var01, var02):
-    current_app.logger.info(f'var01 = {var01}')
-    current_app.logger.info(f'var02 = {var02}')
+@analysts.route('/newsletter', methods=['GET'])
+def get_searches():
+    current_app.logger.info('GET /newsletter route')
+    search_info = request.json
+    days = search_info.get('days', 30)
 
-    returnVal = predict(var01, var02)
-    return_dict = {'result': returnVal}
-
-    the_response = make_response(jsonify(return_dict))
+    query = f'''SELECT Rec.Name, AVG(Rev.Rating) as AvgRating
+FROM Recipe Rec
+	NATURAL JOIN Review Rev
+	JOIN Newsletter N ON Rec.RecipeID = N.RecipeID
+WHERE N.SubDate > NOW() - INTERVAL {days} DAY
+ORDER BY AvgRating DESC
+'''
+    cursor = db.get_db().cursor()
+    cursor.execute(query)
+    theData = cursor.fetchall()
+    
+    the_response = make_response(jsonify(theData))
     the_response.status_code = 200
-    the_response.mimetype = 'application/json'
+    return the_response
+
+@analysts.route('/reviews', methods=['GET'])
+def get_searches():
+    current_app.logger.info('GET /reviews route')
+    search_info = request.json
+    maxrating = search_info.get('max_rating', 5)
+
+    query = f'''SELECT Rev.ReviewText, Rev.Rating, Rec.Name
+FROM Review Rev
+	NATURAL JOIN Recipe Rec
+WHERE Rev.Rating <= {maxrating}
+'''
+    cursor = db.get_db().cursor()
+    cursor.execute(query)
+    theData = cursor.fetchall()
+    
+    the_response = make_response(jsonify(theData))
+    the_response.status_code = 200
+    return the_response
+
+@analysts.route('/recipes/analytics', methods=['GET'])
+def get_searches():
+    current_app.logger.info('GET /recipes/analytics route')
+    search_info = request.json
+    days = search_info.get('days', 30)
+
+    query = f'''SELECT Rec.Name, AVG(Rev.Rating) as AvgRating, COUNT(S.CookID) as Shares,
+COUNT(OT.TrafficID) as OffsiteClicks
+FROM Recipes Rec
+	NATURAL JOIN Review Rev
+	NATURAL JOIN Shares S
+	NATURAL JOIN OffsiteTraffic OT
+GROUP BY Rec.RecipeID
+ORDER BY AvgRating DESC
+'''
+    cursor = db.get_db().cursor()
+    cursor.execute(query)
+    theData = cursor.fetchall()
+    
+    the_response = make_response(jsonify(theData))
+    the_response.status_code = 200
     return the_response
