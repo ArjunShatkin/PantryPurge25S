@@ -24,31 +24,36 @@ if st.button("Search"):
 
     if ingredients_input.strip():
         ingredients = [ingredient.strip() for ingredient in ingredients_input.split(",")]
-
         ingredients_url = "http://api:4000/casual_cooks/recipes/match"
-
-        ingredients_results = requests.post(url, json={
-            "ingredients": ingredients
-        })
+        ingredients_response = requests.post(ingredients_url, json={
+            "ingredients": ingredients})
         if ingredients_response.status_code == 200:
             ingredients_results = ingredients_response.json()
 
-    if max_prep_time > 0 and cuisine.strip() and diet.strip():
-        filter_url = "http://api:4000/casual_cooks/recipes/filter"
+    used_filter = max_prep_time > 0 and cuisine.strip() and diet.strip()
+
+    if used_filter:
         filters = {
             "max_prep_time": max_prep_time,
             "cuisine": cuisine.strip(),
             "diet": diet.strip()
         }
+        filter_url = "http://api:4000/casual_cooks/recipes/filter"
         filter_response = requests.get(filter_url, params=filters)
         if filter_response.status_code == 200:
             filter_results = filter_response.json()
 
-    if ingredients_results and filter_results:
+    search_results = []
+    if used_filter:
         search_results = [recipe for recipe in ingredients_results if recipe in filter_results]
+    else:
+        search_results = ingredients_results
+
+    if search_results:
         st.write("Search Results:")
-        for recipe in ingredients_results:
-            if recipe in filter_results:
-                st.write(f"- {recipe['name']}")
-                st.write(f"  Ingredients: {', '.join(recipe['ingredients'])}")
-                st.write(f"  Instructions: {recipe['instructions']}")
+        for recipe in search_results:
+            st.write(f"- {recipe['name']}")
+            st.write(f"  Ingredients: {', '.join(recipe['ingredients'])}")
+            st.write(f"  Instructions: {recipe['instructions']}")
+    else:
+        st.write("No recipes in database.")
