@@ -84,7 +84,7 @@ def filter_recipes():
     return the_response
 
 #------------------------------------------------------------
-# GUser Story 4.3
+# User Story 4.3
 @casual_cooks.route('/cooks/<int:cook_id>/reviews', methods=['GET'])
 def review_history(cook_id):
     query = """
@@ -239,11 +239,11 @@ def adjust_recipe(recipe_id):
     theData = cursor.fetchall()
     cursor.close()
     adjusted = [{"RecipeID": row[0],
-                    "RecipeName": row[1],
-                    "OriginalServings": row[2],
-                    "IngredientName": row[3],
-                    "OriginalQuantity": row[4],
-                    "AdjustedQuantity": row[5]}
+                 "RecipeName": row[1],
+                 "OriginalServings": row[2],
+                 "IngredientName": row[3],
+                 "OriginalQuantity": row[4],
+                 "AdjustedQuantity": row[5]}
                     for row in theData]
     the_response = make_response(jsonify(adjusted))
     the_response.status_code = 200
