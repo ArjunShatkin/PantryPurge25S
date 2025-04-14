@@ -8,7 +8,7 @@ st.title("Welcome Professional Chef, Anthony")
 st.write("Welcome to the Professional Chef Home Page!")
 
 if st.button("View Your Recipes"):
-    st.switch_page("pages/search_recipes.py")
+    st.switch_page("pages/100_ViewRecipes.py")
 
 if st.button("Add A Recipe"):
     st.switch_page("pages/search_recipes.py")
