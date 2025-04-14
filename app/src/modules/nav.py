@@ -55,6 +55,12 @@ def AdminPageNav():
         "pages/21_ML_Model_Mgmt.py", label="ML Model Management", icon="🏢"
     )
 
+#### ------------------------ Casual Cook Role ------------------------
+def CCPageNav():
+    st.sidebar.page_link("pages/CC_Home.py", label="Casual Cook Home", icon="🖥️")
+    st.sidebar.page_link("pages/search_recipes.py", label="Search", icon="🍽️")
+    
+
 
 # --------------------------------Links Function -----------------------------------------------
 def SideBarLinks(show_home=False):
@@ -92,6 +98,9 @@ def SideBarLinks(show_home=False):
         # If the user is an administrator, give them access to the administrator pages
         if st.session_state["role"] == "administrator":
             AdminPageNav()
+
+        if st.session_state["role"] == "casual_cook":
+            CCPageNav()
 
     # Always show the About page at the bottom of the list of links
     AboutPageNav()
