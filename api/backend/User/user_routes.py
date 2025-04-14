@@ -54,13 +54,13 @@ def update_user():
     return 'user updated'
 
 
-@users.route('/users/<datecreated>', methods=['GET'])
+@users.route('/users/date', methods=['GET'])
 def creation_date_count():
 
     cursor = db.get_db().cursor()
     
     query = '''
-        Select month(datecreated) as month, Count(*)
+        Select month(datecreated) as month, Count(*) as number_of_users
         from User
         group by month(DateCreated)
     '''

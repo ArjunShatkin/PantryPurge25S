@@ -5,11 +5,11 @@ import requests
 
 SideBarLinks()
 
-st.write("# New Users")
+st.write("# Users")
 
 
 
-users = requests.get('http://api:4000/u/users/dates').json()
+users = requests.get('http://api:4000/u/users/date').json()
 try:
   st.dataframe(users)
 except:
