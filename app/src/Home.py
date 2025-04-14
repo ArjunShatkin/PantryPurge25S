@@ -63,7 +63,7 @@ if st.button('Act as Anthony, Professional Chef',
     st.session_state['authenticated'] = True
     st.session_state['role'] = 'Professional Chef'
     st.session_state['first_name'] = 'Anthony'
-    st.switch_page('pages/10_USAID_Worker_Home.py')
+    st.switch_page('pages/ProChef_Home.py')
 
 if st.button('Act as Jack, Casual Cook', 
             type = 'primary', 
