@@ -9,9 +9,9 @@ st.write("# Update Issue")
 
 
 
-users = requests.put('http://api:4000/u/users').json()
+issues = requests.put('http://api:4000/i/issues').json()
 try:
-  st.dataframe(users)
+  st.dataframe(issues)
 except:
   st.write("could not connect to databade to get users!")
 
