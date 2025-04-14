@@ -30,7 +30,7 @@ def recipe_match():
         FROM Recipe r
         JOIN RecipeIngredient ri ON r.RecipeID = ri.RecipeID
         JOIN Ingredient i ON ri.IngredientID = i.IngredientID
-        WHERE i.IngredientName IN ({placeholder})
+        WHERE LOWER(i.IngredientName) IN ({placeholder})
     """
 
     current_app.logger.info('POST /recipes/match route; %s', ingredients)
