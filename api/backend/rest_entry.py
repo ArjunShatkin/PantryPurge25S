@@ -7,7 +7,9 @@ from backend.simple.simple_routes import simple_routes
 from backend.user.user_routes import users
 from backend.simple.arjundemo import recipes
 from backend.simple.arjundemo import chefs
+from backend.user.user_routes import issues
 from backend.casual_cooks.chancedemo import casual_cooks
+
 import os
 from dotenv import load_dotenv
 
@@ -50,6 +52,7 @@ def create_app():
     app.register_blueprint(products,    url_prefix='/p')
     app.register_blueprint(recipes, url_prefix='/r')
     app.register_blueprint(chefs, url_prefix='/c')
+    app.register_blueprint(issues, url_prefix='/i')
     app.register_blueprint(casual_cooks, url_prefix='/cc')
 
     # Don't forget to return the app object
