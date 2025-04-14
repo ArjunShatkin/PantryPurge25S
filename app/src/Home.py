@@ -57,12 +57,12 @@ if st.button("Act as Dave, Analyst",
     logger.info("Logging in as Data Analyst Persona")
     st.switch_page('pages/00_Pol_Strat_Home.py')
 
-if st.button('Act as Chef', 
+if st.button('Act as Anthony, Professional Chef', 
             type = 'primary', 
             use_container_width=True):
     st.session_state['authenticated'] = True
-    st.session_state['role'] = 'usaid_worker'
-    st.session_state['first_name'] = 'Mohammad'
+    st.session_state['role'] = 'Professional Chef'
+    st.session_state['first_name'] = 'Anthony'
     st.switch_page('pages/10_USAID_Worker_Home.py')
 
 if st.button('Act as Jack, Casual Cook', 
@@ -80,8 +80,6 @@ if st.button('Act as Jane, System Administrator',
     st.session_state['role'] = 'administrator'
     st.session_state['first_name'] = 'SysAdmin'
     st.switch_page('pages/system_admin_home.py')
-
-
 
 
 
