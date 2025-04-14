@@ -26,16 +26,14 @@ def recipe_match():
     placeholder = ','.join(['%s'] * len(ingredients))
 
     query = f"""
-        SELECT r.RecipeID, r.RecipeName, r.Description
+        SELECT DISTINCT r.RecipeID, r.RecipeName, r.Description
         FROM Recipe r
-        WHERE NOT EXISTS (
-            SELECT 1
-            FROM RecipeIngredient ri
-            WHERE ri.RecipeID = r.RecipeID
-                AND ri.IngredientID NOT IN ({placeholder}));
+        JOIN RecipeIngredient ri ON r.RecipeID = ri.RecipeID
+        JOIN Ingredient i ON ri.IngredientID = i.IngredientID
+        WHERE i.IngredientName IN ({placeholder})
     """
 
-    current_app.logger.info('POST /recipes/match route')
+    current_app.logger.info('POST /recipes/match route; %s', ingredients)
     cursor = db.get_db().cursor()
     cursor.execute(query, tuple(ingredients))
     theData = cursor.fetchall()
@@ -59,17 +57,32 @@ def filter_recipes():
     query = """
         SELECT r.RecipeID, r.RecipeName, r.Description, r.PrepTimeMins, r.CookTimeMins, r.Cuisine
         FROM Recipe r
-        JOIN DietRecipe dr ON r.RecipeID = dr.RecipeID
-        JOIN DietaryRestrictions d ON dr.DietRestID = d.DietRestID
-        WHERE r.PrepTimeMins <= %s
-            AND r.Cuisine = %s
-            AND d.RestName = %s
-        ORDER BY r.PrepTimeMins ASC;
+        LEFT JOIN DietRecipe dr ON r.RecipeID = dr.RecipeID
+        LEFT JOIN DietaryRestrictions d ON dr.DietRestID = d.DietRestID
     """
 
-    current_app.logger.info('GET /recipes/filter route')
+    filters = []
+    parameters = []
+
+    if prep_time_max is not None:
+        filters.append("r.PrepTimeMins <= %s")
+        parameters.append(prep_time_max)
+    if cuisine is not None:
+        filters.append("r.Cuisine = %s")
+        parameters.append(cuisine.strip())
+    if diet_rest is not None:
+        filters.append("d.DietRestName = %s")
+        parameters.append(diet_rest.strip())
+
+    if filters:
+        query += " WHERE " + " AND ".join(filters)
+
+    query += " ORDER BY r.PrepTimeMins ASC;"
+
+    current_app.logger.info('GET /recipes/filter route; prep_time_max: %s, cuisine: %s, diet_rest: %s',
+                            prep_time_max, cuisine, diet_rest)
     cursor = db.get_db().cursor()
-    cursor.execute(query, (prep_time_max, cuisine, diet_rest))
+    cursor.execute(query, tuple(parameters))
     theData = cursor.fetchall()
     recipes_list = [{"RecipeID": row[0],
                      "RecipeName": row[1],
@@ -217,7 +230,7 @@ def recipe_calories(recipe_id):
 # User Story 4.7
 @casual_cooks.route('/recipes/<int:recipe_id>/adjust', methods=['GET'])
 def adjust_recipe(recipe_id):
-    new_servings= request.args.get('new_servings', type=float)
+    new_servings = request.args.get('new_servings', type=float)
     query = """
         SELECT
             r.RecipeID,
