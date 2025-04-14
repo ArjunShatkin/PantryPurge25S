@@ -14,9 +14,9 @@ ingredients_column = columns[0]
 ingredients_input = ingredients_column.text_input("Ingredients", "chicken, rice, broccoli")
 
 filter_column = columns[1]
-max_prep_time = filter_column.number_input("Max Preparation Time (minutes)", min_value=0, value=360)
+prep_time_max = filter_column.number_input("Max Preparation Time (minutes)", min_value=0, value=360)
 cuisine = filter_column.text_input("Cuisine", "Italian")
-diet = filter_column.text_input("Diet", "Vegetarian")
+diet_rest = filter_column.text_input("Diet", "Vegetarian")
 
 if st.button("Search"):
     ingredients_results = []
@@ -30,13 +30,13 @@ if st.button("Search"):
         if ingredients_response.status_code == 200:
             ingredients_results = ingredients_response.json()
 
-    used_filter = max_prep_time > 0 and cuisine.strip() and diet.strip()
+    used_filter = prep_time_max > 0 and cuisine.strip() and diet_rest.strip()
 
     if used_filter:
         filters = {
-            "max_prep_time": max_prep_time,
+            "prep_time_max": prep_time_max,
             "cuisine": cuisine.strip(),
-            "diet": diet.strip()
+            "diet_rest": diet_rest.strip()
         }
         filter_url = "http://api:4000/casual_cooks/recipes/filter"
         filter_response = requests.get(filter_url, params=filters)
@@ -45,15 +45,15 @@ if st.button("Search"):
 
     search_results = []
     if used_filter:
-        search_results = [recipe for recipe in ingredients_results if recipe in filter_results]
+        recipe_ids = [recipe['RecipeID'] for recipe in filter_results]
+        search_results = [recipe for recipe in ingredients_results if recipe['RecipeID'] in recipe_ids]
     else:
         search_results = ingredients_results
 
     if search_results:
         st.write("Search Results:")
         for recipe in search_results:
-            st.write(f"- {recipe['name']}")
-            st.write(f"  Ingredients: {', '.join(recipe['ingredients'])}")
-            st.write(f"  Instructions: {recipe['instructions']}")
+            st.write(f"- {recipe['RecipeName']}")
+            st.write(f"  Description: {recipe['Description']}")
     else:
         st.write("No recipes in database.")
