@@ -244,6 +244,3 @@ CREATE TABLE IF NOT EXISTS Newsletter (
     FOREIGN KEY (RecipeID) REFERENCES Recipe (RecipeID)
 );
 
-
-Select IssueID, UserID, EnteredTime, Priority, Status, Title, Description, ResolvedDate,
-       From Issue

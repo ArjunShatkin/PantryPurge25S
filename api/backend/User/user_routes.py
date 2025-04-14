@@ -43,7 +43,6 @@ def update_user():
     user_info = request.json
     user_id = user_info['UserId']
     user_name = user_info['Username']
-    created = user_info['datecreated']
     status = user_info['UserStatus']
 
     query = 'UPDATE users SET user_name = %s,  status = %s where id = %s'
@@ -76,14 +75,36 @@ def creation_date_count():
     response.status_code = 200
     return response
     
-@issues.route('/issue/', methods=['GET'])
+@issues.route('/issues', methods=['GET'])
 def get_all_issues():
 
     cursor = db.get_db().cursor()
     
     query = '''
         Select  IssueID, UserID, EnteredTime, Priority, Status, Title, Description, ResolvedDate
-        From issue
+        From Issue
+    '''
+    
+    # Same process as above
+    
+    cursor.execute(query)
+    theData = cursor.fetchall()
+
+    
+    response = make_response(theData)
+    response.mimetype = 'application/json'
+    response.status_code = 200
+    return response
+
+@issues.route('/issues/prior', methods=['GET'])
+def prior_issues():
+
+    cursor = db.get_db().cursor()
+    
+    query = '''
+        Select  IssueID, UserID, EnteredTime, Priority, Status, Title, Description, ResolvedDate
+        From Issue
+        Where ResolvedDate IS NOT NULL
     '''
     
     # Same process as above
@@ -99,6 +120,7 @@ def get_all_issues():
 
 @issues.route('/issues', methods = ['POST'])
 def add_new_issue():
+    
     the_data = request.json 
     current_app.logger.info(the_data)
 
