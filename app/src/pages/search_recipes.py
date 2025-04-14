@@ -23,7 +23,7 @@ if st.button("Search"):
 
     if ingredients_input.strip():
         ingredients = [ingredient.strip() for ingredient in ingredients_input.split(",")]
-        ingredients_url = "http://web-api-test:4000/casual_cooks/recipes/match"
+        ingredients_url = "http://web-api-test:4000/cc/recipes/match"
         ingredients_response = requests.post(ingredients_url, json={
             "ingredients": ingredients})
         if ingredients_response.status_code == 200:
@@ -32,18 +32,18 @@ if st.button("Search"):
     used_filters = {}
     if prep_time_max > 0:
         used_filters["prep_time_max"] = prep_time_max
-    if cuisine:
+    if cuisine.strip():
         used_filters["cuisine"] = cuisine.strip()
-    if diet_rest:
+    if diet_rest.strip():
         used_filters["diet_rest"] = diet_rest.strip()
 
     if used_filters:
-        filter_url = "http://web-api-test:4000/casual_cooks/recipes/filter"
+        filter_url = "http://web-api-test:4000/cc/recipes/filter"
         filter_response = requests.get(filter_url, params=used_filters)
         if filter_response.status_code == 200:
             filter_results = filter_response.json()
 
-    if ingredients_results and not filter_results:
+    if ingredients_results and filter_results:
         found_ids = {recipe['RecipeID'] for recipe in filter_results}
         search_results = [recipe for recipe in ingredients_results if recipe['RecipeID'] in found_ids]
     else:
@@ -55,4 +55,4 @@ if st.button("Search"):
             st.write(f"- {recipe['RecipeName']}")
             st.write(f"  Description: {recipe['Description']}")
     else:
-        st.write("No recipes in database.")
+        st.write("No recipes in database.")# test-change
