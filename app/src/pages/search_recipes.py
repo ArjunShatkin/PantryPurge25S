@@ -43,13 +43,15 @@ if st.button("Search"):
         if filter_response.status_code == 200:
             filter_results = filter_response.json()
 
-    if ingredients_results and not filter_results:
+    if ingredients_results and filter_results:
         found_ids = {recipe['RecipeID'] for recipe in filter_results}
         search_results = [recipe for recipe in ingredients_results if recipe['RecipeID'] in found_ids]
     elif filter_results:
         search_results = filter_results
-    else:
+    elif ingredients_results:
         search_results = ingredients_results
+    else:
+        search_results = []
 
     if search_results:
         st.write("Search Results:")
