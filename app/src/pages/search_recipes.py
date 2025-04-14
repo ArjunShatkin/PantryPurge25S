@@ -23,7 +23,7 @@ if st.button("Search"):
 
     if ingredients_input.strip():
         ingredients = [ingredient.strip() for ingredient in ingredients_input.split(",")]
-        ingredients_url = "http://web-api-test:4000/casual_cooks/recipes/match"
+        ingredients_url = "http://web-api-test:4000/cc/recipes/match"
         ingredients_response = requests.post(ingredients_url, json={
             "ingredients": ingredients})
         if ingredients_response.status_code == 200:
@@ -38,7 +38,7 @@ if st.button("Search"):
         used_filters["diet_rest"] = diet_rest.strip()
 
     if used_filters:
-        filter_url = "http://web-api-test:4000/casual_cooks/recipes/filter"
+        filter_url = "http://web-api-test:4000/cc/recipes/filter"
         filter_response = requests.get(filter_url, params=used_filters)
         if filter_response.status_code == 200:
             filter_results = filter_response.json()
