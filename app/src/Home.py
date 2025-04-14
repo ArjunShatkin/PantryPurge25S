@@ -69,7 +69,7 @@ if st.button('Act as Jack, Casual Cook',
             type = 'primary', 
             use_container_width=True):
     st.session_state['authenticated'] = True
-    st.session_state['role'] = 'administrator'
+    st.session_state['role'] = 'casual_cook'
     st.session_state['first_name'] = 'Casual Cook'
     st.switch_page('pages/casual_cook_home.py')
 
