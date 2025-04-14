@@ -53,7 +53,7 @@ def create_app():
     app.register_blueprint(recipes, url_prefix='/r')
     app.register_blueprint(chefs, url_prefix='/c')
     app.register_blueprint(issues, url_prefix='/i')
-    app.register_blueprint(casual_cooks, url_prefix='/cc')
+    app.register_blueprint(casual_cooks, url_prefix='/casual_cooks')
 
     # Don't forget to return the app object
     return app
