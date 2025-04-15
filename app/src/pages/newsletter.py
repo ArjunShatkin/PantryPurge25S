@@ -43,14 +43,14 @@ for row in df.itertuples(index=True, name='Row'):
 
         with col1:
             if st.button(f"✅ Accept {row.RecipeName} to Newsletter", key=f"accept_{row.Index}"):
-                response = requests.put('http://api:4000/a/newsletter/{sub_id}', json={"SubStatus": "Accepted"})
-                if response == 'Newsletter updated!':
+                response = requests.put('http://api:4000/a/newsletter', json={"SubStatus": "Accepted", "SubID": sub_id})
+                if response.status_code == 200:
                     st.success(f"Accepted {row.RecipeName}!")
 
         with col2:
             if st.button(f"❌ Reject {row.RecipeName} from Newsletter", key=f"reject_{row.Index}"):
-                response = requests.put('http://api:4000/a/newsletter/{sub_id}', json={"SubStatus": "Accepted"})
-                if response == 'Newsletter updated!':
+                response = requests.put('http://api:4000/a/newsletter', json={"SubStatus": "Rejected", "SubID": sub_id})
+                if response.status_code == 200:
                     st.error(f"Rejected {row.RecipeName}!")
 
 df

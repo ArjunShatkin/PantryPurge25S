@@ -110,18 +110,22 @@ def get_newsletter():
     the_response.status_code = 200
     return the_response
 
-@analysts.route('/newsletter/<int:sub_id>', methods=['PUT'])
-def update_customer(sub_id):
+@analysts.route('/newsletter', methods=['PUT'])
+def update_customer():
     current_app.logger.info('PUT /newsletter/id route')
     info = request.json
     new_status = info['SubStatus']
+    sub_id = info['SubID']
 
     query = 'UPDATE Newsletter SET SubStatus = %s WHERE SubID = %s'
     data = (new_status, sub_id)
     cursor = db.get_db().cursor()
     cursor.execute(query, data)
     db.get_db().commit()
-    return 'Newsletter updated!'
+    the_response = make_response(jsonify('Newsletter updated!'))
+    the_response.status_code = 200
+
+    return the_response
 
 @analysts.route('/reviews', methods=['GET'])
 def get_reviews():
