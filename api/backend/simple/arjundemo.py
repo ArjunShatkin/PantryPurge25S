@@ -4,6 +4,7 @@ from flask import jsonify
 from flask import make_response
 from flask import current_app
 from backend.db_connection import db
+import json
 
 recipes = Blueprint('recipes', __name__)
 chefs = Blueprint('chefs', __name__)
@@ -218,35 +219,35 @@ def get_chefs_in_same_state(chef_id):
 
 @recipes.route('/chefs/<int:chef_id>/recipes', methods=['GET'])
 def get_chef_recipes(chef_id):
-    current_app.logger.info(f'GET /chefs/{chef_id}/recipes route')
-
     try:
-        # Create a cursor to interact with the database
-        cursor = db.get_db().cursor()
+        # Connect and create a cursor
+        conn = db.get_db()
+        cursor = conn.cursor()
 
-        # SQL query to fetch recipes for a specific chef and their performance metrics
-        query = '''
+        # Safe, simple query
+        cursor.execute("""
             SELECT 
                 RecipeID, RecipeName, NumShares, NumViews, NumReviews, 
                 IsFeatured, PublishDate
             FROM Recipe
             WHERE ChefID = %s
-        '''
-        cursor.execute(query, (chef_id,))
-        recipes_data = cursor.fetchall()
+        """, (chef_id,))
 
-        # Check if no recipes were found
-        if not recipes_data:
-            return jsonify({"error": "No recipes found for this chef."}), 404
-
-        # Format the result as a list of dictionaries (one for each recipe)
+        # Fetch rows
+        rows = cursor.fetchall()
         columns = [desc[0] for desc in cursor.description]
-        recipes_list = [dict(zip(columns, row)) for row in recipes_data]
 
-        # Return the list of recipes with their performance metrics
-        return jsonify(recipes_list), 200
+        # Convert rows to list of dictionaries
+        recipes_list = [dict(zip(columns, row)) for row in rows]
+
+        # Create proper JSON response
+        response = make_response(jsonify(recipes_list))
+        response.mimetype = 'application/json'
+        response.status_code = 200
+        return response
 
     except Exception as e:
-        # Rollback in case of error
-        db.get_db().rollback()
-        return jsonify({"error": str(e)}), 500
+        # Fail safe
+        print("Error:", str(e))
+        return jsonify({"error": "Something went wrong."}), 500
+        
