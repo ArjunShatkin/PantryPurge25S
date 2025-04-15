@@ -17,6 +17,9 @@ prep_time_max = filter_column.number_input("Max Preparation Time (minutes)", min
 cuisine = filter_column.text_input("Cuisine", "")
 diet_rest = filter_column.text_input("Diet", "")
 
+if "search_results" not in st.session_state:
+    st.session_state["search_results"] = []
+
 if st.button("Search"):
     ingredients_results = []
     filter_results = []
@@ -53,13 +56,16 @@ if st.button("Search"):
     else:
         search_results = []
 
-    if search_results:
-        st.write("Search Results:")
-        for recipe in search_results:
-            st.write(f"- {recipe['RecipeName']}")
-            st.write(f"  Description: {recipe['Description']}")
-            if st.button("View Recipe", key=f"view_{recipe['RecipeID']}"):
-                st.session_state["selected_id"] = recipe["RecipeID"]
-                #st.switch_page("pages/recipe_profile.py")  
-    else:
-        st.write("No recipes in database.")
+    st.session_state["search_results"] = search_results
+
+if st.session_state["search_results"]:
+    st.write("Search Results:")
+    for recipe in st.session_state["search_results"]:
+        st.write(f"- {recipe['RecipeName']}")
+        st.write(f"  Description: {recipe['Description']}")
+        if st.button("View Recipe", key=f"view_{recipe['RecipeID']}"):
+            st.session_state["selected_id"] = recipe['RecipeID']
+            st.write(f"Viewing recipe: {recipe['RecipeName']}")
+            st.switch_page("pages/recipe_profile.py")
+else:
+    st.write("No recipes in database.")
