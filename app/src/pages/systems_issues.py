@@ -34,5 +34,10 @@ if st.button('Resolved Issues',
 if st.button('New Issue', 
              type='primary',
              use_container_width=True):
-  st.switch_page('pages/update_issue.py')
+  st.switch_page('pages/add_issue.py')
+
+if st.button('Delete Issue', 
+             type='primary',
+             use_container_width=True):
+  st.switch_page('pages/delete_issue.py')
 

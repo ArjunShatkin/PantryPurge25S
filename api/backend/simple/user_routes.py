@@ -38,7 +38,7 @@ def get_all_users():
     return response
 
 @users.route('/users', methods=['PUT'])
-def update_user():
+def new_user():
     current_app.logger.info('PUT /users route')
     user_info = request.json
     user_id = user_info['UserId']
@@ -50,7 +50,7 @@ def update_user():
     cursor = db.get_db().cursor()
     r = cursor.execute(query, data)
     db.get_db().commit()
-    return 'user updated'
+    return 'new user added'
 
 
 @users.route('/users/date', methods=['GET'])
@@ -156,19 +156,27 @@ def add_new_issue():
     return response
 
 
-@issues.route('/issues', methods = ['Delete'])
-def delete_issue():
-    current_app.logger.info('Delete/issue')
-    issue_info = request.json
-    issue_id = issue_info['issueId']
-    
+@issues.route('/issues/<int:issueid>/del', methods=['DELETE'])
+def delete_issue(issueid):
+    current_app.logger.info(f'DELETE /issues/{issueid} route')
 
-    query = 'Delete Issue where issueid = %s'
-    
-    cursor = db.get_db().cursor()
-    cursor.execute(query)
-    
-    return 'user updated'
+    try:
+        conn = db.get_db()
+        cursor = conn.cursor()
+
+        # Then delete the recipe itself
+        cursor.execute("DELETE FROM Issue WHERE IssueID = %s;", (issueid,))
+
+
+        conn.commit()
+
+        return jsonify({"message": f"Recipe with ID {issueid} successfully deleted."}), 200
+
+    except Exception as e:
+        db.get_db().rollback()
+        current_app.logger.error(f"Error deleting recipe: {e}")
+        
+        return jsonify({"error": str(e)}), 500
 
 
 
