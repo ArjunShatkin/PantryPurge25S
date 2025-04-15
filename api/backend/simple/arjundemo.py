@@ -167,6 +167,7 @@ def submit_recipe_for_newsletter(recipe_id):
         '''
         values = (chef_id, recipe_id, sub_status, sub_date)
         cursor.execute(query, values)
+        
         sub_id = cursor.lastrowid
 
         db.get_db().commit()
@@ -185,6 +186,7 @@ def submit_recipe_for_newsletter(recipe_id):
         current_app.logger.error(f"Exception: {e}")
         traceback.print_exc()
         return jsonify({"error": str(e)}), 500
+        # return jsonify({sub_id}), 500
 
 
 
