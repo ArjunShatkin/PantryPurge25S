@@ -54,5 +54,8 @@ if st.button("Search"):
         for recipe in search_results:
             st.write(f"- {recipe['RecipeName']}")
             st.write(f"  Description: {recipe['Description']}")
+            if st.button("View Recipe", key=f"view_{recipe['RecipeID']}"):
+                st.session_state["selected_id"] = recipe["RecipeID"]
+                #st.switch_page("pages/recipe_profile.py")  
     else:
-        st.write("No recipes in database.")# test-change
+        st.write("No recipes in database.")
