@@ -237,6 +237,7 @@ def adjust_recipe(recipe_id):
             r.RecipeName,
             r.Servings AS OriginalServings,
             i.IngredientName,
+            i.MeasureUnit,
             ri.Quantity AS OriginalQuantity,
             ROUND(ri.Quantity * %s / r.Servings, 2) AS AdjustedQuantity
         FROM Recipe r
@@ -255,6 +256,7 @@ def adjust_recipe(recipe_id):
                  "RecipeName": row["RecipeName"],
                  "OriginalServings": row["OriginalServings"],
                  "IngredientName": row["IngredientName"],
+                 "MeasureUnit": row["MeasureUnit"],
                  "OriginalQuantity": row["OriginalQuantity"],
                  "AdjustedQuantity": row["AdjustedQuantity"]}
                  for row in theData]
@@ -315,10 +317,13 @@ def get_recipe_profile(recipe_id):
     reviews_query = """
         SELECT
             r.CookID,
+            cc.FirstName,
+            cc.LastName,
             r.Rating,
             r.ReviewText,
             r.ReviewDate
         FROM Review r
+        JOIN CasualCook cc ON r.CookID = cc.CookID
         WHERE r.RecipeID = %s
         ORDER BY ReviewDate DESC;
     """            
@@ -328,7 +333,7 @@ def get_recipe_profile(recipe_id):
     reviews = cursor2.fetchall()
     cursor2.close()
 
-    reviews_info = [{"CookID": row["CookID"],
+    reviews_info = [{"CookName": f"{row['FirstName']} {row['LastName']}".strip(),
                      "Rating": row["Rating"],
                      "ReviewText": row["ReviewText"],
                      "ReviewDate": row["ReviewDate"]}
