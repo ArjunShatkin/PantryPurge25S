@@ -6,6 +6,7 @@ from flask import current_app
 from backend.db_connection import db
 import json
 import traceback
+import datetime
 
 recipes = Blueprint('recipes', __name__)
 chefs = Blueprint('chefs', __name__)
@@ -152,7 +153,7 @@ def submit_recipe_for_newsletter(recipe_id):
     chef_id = data.get('ChefID')
     
     sub_status = data.get('SubStatus', 'Pending')
-    sub_date = datetime.now()
+    sub_date = datetime.datetime.now()
 
     if not chef_id:
         return jsonify({"error": "ChefID is required."}), 400
@@ -162,12 +163,11 @@ def submit_recipe_for_newsletter(recipe_id):
 
         query = '''
             INSERT INTO Newsletter (ChefID, RecipeID, SubStatus, SubDate)
-            VALUES (%s, %s, %s, %s)
-            RETURNING SubID;
+            VALUES (%s, %s, %s, %s);
         '''
         values = (chef_id, recipe_id, sub_status, sub_date)
         cursor.execute(query, values)
-        sub_id = cursor.fetchone()[0]
+        sub_id = cursor.lastrowid
 
         db.get_db().commit()
 
@@ -242,13 +242,9 @@ def get_chef_recipes(chef_id):
 
         # Fetch rows
         rows = cursor.fetchall()
-        columns = [desc[0] for desc in cursor.description]
-
-        # Convert rows to list of dictionaries
-        recipes_list = [dict(zip(columns, row)) for row in rows]
 
         # Create proper JSON response
-        response = make_response(jsonify(recipes_list))
+        response = make_response(jsonify(rows))
         response.mimetype = 'application/json'
         response.status_code = 200
         return response
@@ -263,11 +259,16 @@ def delete_recipe(recipe_id):
     current_app.logger.info(f'DELETE /recipes/{recipe_id} route')
 
     try:
-        cursor = db.get_db().cursor()
+        conn = db.get_db()
+        cursor = conn.cursor()
 
-        # Delete the recipe
+        # Then delete the recipe itself
         cursor.execute("DELETE FROM Recipe WHERE RecipeID = %s;", (recipe_id,))
-        db.get_db().commit()
+
+        # First delete related entries in Newsletter
+        cursor.execute("DELETE FROM Newsletter WHERE RecipeID = %s;", (recipe_id,))
+
+        conn.commit()
 
         return jsonify({"message": f"Recipe with ID {recipe_id} successfully deleted."}), 200
 
@@ -275,5 +276,6 @@ def delete_recipe(recipe_id):
         db.get_db().rollback()
         current_app.logger.error(f"Error deleting recipe: {e}")
         return jsonify({"error": str(e)}), 500
+
 
         
