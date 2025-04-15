@@ -14,23 +14,6 @@ def AboutPageNav():
     st.sidebar.page_link("pages/30_About.py", label="About", icon="🧠")
 
 
-#### ------------------------ Examples for Role of pol_strat_advisor ------------------------
-def PolStratAdvHomeNav():
-    st.sidebar.page_link(
-        "pages/00_Pol_Strat_Home.py", label="Political Strategist Home", icon="👤"
-    )
-
-
-def WorldBankVizNav():
-    st.sidebar.page_link(
-        "pages/01_World_Bank_Viz.py", label="World Bank Visualization", icon="🏦"
-    )
-
-
-def MapDemoNav():
-    st.sidebar.page_link("pages/02_Map_Demo.py", label="Map Demonstration", icon="🗺️")
-
-
 ## ------------------------ Examples for Role of usaid_worker ------------------------
 def ApiTestNav():
     st.sidebar.page_link("pages/12_API_Test.py", label="Test the API", icon="🛜")
@@ -61,6 +44,22 @@ def CCPageNav():
     st.sidebar.page_link("pages/CC_Home.py", label="Casual Cook Home", icon="🖥️")
     st.sidebar.page_link("pages/search_recipes.py", label="Search", icon="🍽️")
     st.sidebar.page_link("pages/featured_recipes.py", label="Featured Recipes", icon="⭐")
+
+#### ------------------------ Data Analyst Role ------------------------
+def analyst(): 
+    st.sidebar.page_link("pages/search_data.py", label = "View Search Data", icon="📈")
+    st.sidebar.page_link("pages/recipe_analytics.py", label = "View Recipe Analytics", icon="📊")
+    st.sidebar.page_link("pages/newsletter.py", label = "View Newsletter Submissions", icon="📨")
+
+
+#### ------------------------ Data Analyst Role ------------------------
+def prochef(): 
+    st.sidebar.page_link("pages/100_ViewRecipes.py", label = "View Your Recipes", icon="🧾")
+    st.sidebar.page_link("pages/101_AddRecipe.py", label = "Add A Recipe", icon="📝")
+    st.sidebar.page_link("pages/102_NewsletterSubmit.py", label = "Submit to Newsletter", icon="📰")
+    st.sidebar.page_link("pages/104_SearchChefByState.py", label = "View Nearby Chefs", icon="🧑‍🍳")
+    st.sidebar.page_link("pages/103_DeleteChefRecipe.py", label = "Delete Recipe", icon="❌")
+
 
 # --------------------------------Links Function -----------------------------------------------
 def SideBarLinks(show_home=False):
