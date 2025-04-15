@@ -60,8 +60,7 @@ def AdminPageNav():
 def CCPageNav():
     st.sidebar.page_link("pages/CC_Home.py", label="Casual Cook Home", icon="🖥️")
     st.sidebar.page_link("pages/search_recipes.py", label="Search", icon="🍽️")
-    
-
+    st.sidebar.page_link("pages/featured_recipes.py", label="Featured Recipes", icon="⭐")
 
 # --------------------------------Links Function -----------------------------------------------
 def SideBarLinks(show_home=False):
@@ -103,6 +102,7 @@ def SideBarLinks(show_home=False):
 
         if st.session_state["role"] == "casual_cook":
             CCPageNav()
+
 
     # Always show the About page at the bottom of the list of links
     AboutPageNav()
