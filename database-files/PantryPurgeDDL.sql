@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS Chef (
 );
 
 CREATE TABLE IF NOT EXISTS Recipe (
-    RecipeID int PRIMARY KEY NOT NULL,
+    RecipeID int PRIMARY KEY AUTO_INCREMENT,
     Servings smallint,
     Difficulty varchar(15),
     Calories int,
