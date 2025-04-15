@@ -11,7 +11,7 @@ if st.button("View Your Recipes"):
     st.switch_page("pages/100_ViewRecipes.py")
 
 if st.button("Add A Recipe"):
-    st.switch_page("pages/search_recipes.py")
+    st.switch_page("pages/101_AddRecipe.py")
 
 if st.button("Update A Recipe"):
     st.switch_page("pages/search_recipes.py")
