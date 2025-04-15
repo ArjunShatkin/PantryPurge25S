@@ -5,6 +5,7 @@ from flask import make_response
 from flask import current_app
 from backend.db_connection import db
 import json
+import traceback
 
 recipes = Blueprint('recipes', __name__)
 chefs = Blueprint('chefs', __name__)
@@ -145,8 +146,11 @@ newsletter_routes = Blueprint('newsletter_routes', __name__)
 def submit_recipe_for_newsletter(recipe_id):
     current_app.logger.info(f'POST /recipes/{recipe_id}/newsletter route')
 
-    data = request.json
+    data = request.get_json()
+    current_app.logger.debug(f"Received data: {data}")  # Log incoming data
+    
     chef_id = data.get('ChefID')
+    
     sub_status = data.get('SubStatus', 'Pending')
     sub_date = datetime.now()
 
@@ -173,12 +177,15 @@ def submit_recipe_for_newsletter(recipe_id):
             "ChefID": chef_id,
             "RecipeID": recipe_id,
             "SubStatus": sub_status,
-            "SubDate": sub_date
-        }), 201
+            "SubDate": sub_date.isoformat()
+        }), 200
 
     except Exception as e:
         db.get_db().rollback()
+        current_app.logger.error(f"Exception: {e}")
+        traceback.print_exc()
         return jsonify({"error": str(e)}), 500
+
 
 
 @chefs.route('/chefs/<int:chef_id>/region', methods=['GET'])
@@ -250,4 +257,23 @@ def get_chef_recipes(chef_id):
         # Fail safe
         print("Error:", str(e))
         return jsonify({"error": "Something went wrong."}), 500
+
+@recipes.route('/recipes/<int:recipe_id>/del', methods=['DELETE'])
+def delete_recipe(recipe_id):
+    current_app.logger.info(f'DELETE /recipes/{recipe_id} route')
+
+    try:
+        cursor = db.get_db().cursor()
+
+        # Delete the recipe
+        cursor.execute("DELETE FROM Recipe WHERE RecipeID = %s;", (recipe_id,))
+        db.get_db().commit()
+
+        return jsonify({"message": f"Recipe with ID {recipe_id} successfully deleted."}), 200
+
+    except Exception as e:
+        db.get_db().rollback()
+        current_app.logger.error(f"Error deleting recipe: {e}")
+        return jsonify({"error": str(e)}), 500
+
         
