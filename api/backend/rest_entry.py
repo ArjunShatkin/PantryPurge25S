@@ -4,10 +4,10 @@ from backend.db_connection import db
 from backend.customers.customer_routes import customers
 from backend.products.products_routes import products
 from backend.simple.simple_routes import simple_routes
-from backend.user.user_routes import users
+from backend.User.user_routes import users
 from backend.simple.arjundemo import recipes
 from backend.simple.arjundemo import chefs
-from backend.user.user_routes import issues
+from backend.User.user_routes import issues
 from backend.casual_cooks.chancedemo import casual_cooks
 
 import os
