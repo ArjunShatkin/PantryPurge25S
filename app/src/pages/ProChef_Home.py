@@ -13,11 +13,14 @@ if st.button("View Your Recipes"):
 if st.button("Add A Recipe"):
     st.switch_page("pages/101_AddRecipe.py")
 
-if st.button("Update A Recipe"):
-    st.switch_page("pages/search_recipes.py")
+if st.button("Submit to Newsletter"):
+    st.switch_page("pages/102_NewsletterSubmit.py")
 
 if st.button("View Nearby Chefs"):
     st.switch_page("pages/search_recipes.py")
+
+if st.button("Delete Recipe"):
+    st.switch_page("pages/103_DeleteChefRecipe.py")
 
 
 
