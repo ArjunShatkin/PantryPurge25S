@@ -1,7 +1,7 @@
 # Spring 2025 CS 3200 Project - PantryPurge 2025
 ## Arjun Shatkin, Chance Bowman, Samuel Pollak, Meghan Powers
 
-INTRO, OF SORTS?
+PantryPurge is a brand-new recipe database that allows users to search for recipes that fit their needs. This app will allow users to save money by making best use of what they already have in their kitchen to prevent waste. It will also take the hassle out of finding a recipe which you have all the ingredients for. Our search engine will be more open-ended than competitors, allowing novice cooks to work with what they have and making cooking more accessible to even the most casual users. Users can search by listing the ingredients they have in their pantry/fridge to be matched with recipes that best utilize those ingredients. They can also filter by other criteria such as prep time, cuisine, and dietary restrictions. 
 
 ## Prerequisites
 
