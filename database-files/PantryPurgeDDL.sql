@@ -237,7 +237,7 @@ CREATE TABLE IF NOT EXISTS DietRecipe (
 CREATE TABLE IF NOT EXISTS Newsletter (
     ChefID int,
     RecipeID int,
-    SubID int PRIMARY KEY INT NOT NULL AUTO_INCREMENT,
+    SubID int PRIMARY KEY AUTO_INCREMENT,
     SubStatus varchar(30),
     SubDate datetime,
     FOREIGN KEY (ChefID) REFERENCES Chef (ChefID) ON DELETE CASCADE ON UPDATE CASCADE,
