@@ -10,20 +10,21 @@ SideBarLinks()
 st.write("# Your Recipes")
 
 # Input field for Chef ID
-chef_id = st.number_input("Enter Chef ID", step=1)
+chef_id = st.text_input("Enter Chef ID", "")
 
 # Function to fetch recipes based on Chef ID
 def get_recipes_by_chef(chef_id):
     if chef_id:
         try:
             # Request to get recipes for the provided chef_id
-            url = f'http://api:4000/r/chefs/{chef_id}/recipes'
+            url = f'http://api:4000/r/chefs/{int(chef_id)}/recipes'
             response = requests.get(url)
 
             # Check if the response is successful
             if response.status_code == 200:
                 recipes = response.json()
-                # Convert recipes data to DataFrame
+                st.write(f"Received recipes: {recipes}")
+                # Convert recipes data to df
                 df = pd.DataFrame(recipes)
                 return df
             else:
