@@ -18,4 +18,4 @@ if response.status_code == 200:
             st.write(recipe.get('Description'))
             if st.button("View Recipe", key=f"view_{recipe['RecipeID']}"):
                 st.session_state["selected_id"] = recipe['RecipeID']
-                st.switch_page("recipe_profile.py")
+                st.switch_page("pages/recipe_profile.py")
