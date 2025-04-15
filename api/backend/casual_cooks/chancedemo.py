@@ -257,7 +257,7 @@ def adjust_recipe(recipe_id):
                  "IngredientName": row["IngredientName"],
                  "OriginalQuantity": row["OriginalQuantity"],
                  "AdjustedQuantity": row["AdjustedQuantity"]}
-                for row in theData]
+                 for row in theData]
     the_response = make_response(jsonify(adjusted))
     the_response.status_code = 200
     the_response.mimetype = 'application/json'
@@ -284,33 +284,33 @@ def get_recipe_profile(recipe_id):
             r.NumViews,
             r.NumShares,
             r.IsFeatured,
-            r.ChefID,
+            r.ChefID
         FROM Recipe r
         WHERE r.RecipeID = %s;
 
     """
 
     current_app.logger.info('GET /recipes/%s/profile route', recipe_id)
-    cursor = db.get_db().cursor()
-    cursor.execute(recipe_query, (recipe_id,))
-    theData = cursor.fetchone()
-    cursor.close()
+    cursor1 = db.get_db().cursor()
+    cursor1.execute(recipe_query, (recipe_id,))
+    theData = cursor1.fetchone()
+    cursor1.close()
 
-    recipe_info = {"RecipeName": row["RecipeName"],
-                   "Servings": row["Servings"],
-                   "Difficulty": row["Difficulty"],
-                   "Calories": row["Calories"],
-                   "PublishDate": row["PublishDate"],
-                   "Description": row["Description"],
-                   "Cuisine": row["Cuisine"],
-                   "PrepTimeMins": row["PrepTimeMins"],
-                   "CookTimeMins": row["CookTimeMins"],
-                   "VideoUrl": row["VideoUrl"],
-                   "NumReviews": row["NumReviews"],
-                   "NumViews": row["NumViews"],
-                   "NumShares": row["NumShares"],
-                   "IsFeatured": row["IsFeatured"],
-                   "ChefID": row["ChefID"]}
+    recipe_info = {"RecipeName": theData["RecipeName"],
+                   "Servings": theData["Servings"],
+                   "Difficulty": theData["Difficulty"],
+                   "Calories": theData["Calories"],
+                   "PublishDate": theData["PublishDate"],
+                   "Description": theData["Description"],
+                   "Cuisine": theData["Cuisine"],
+                   "PrepTimeMins": theData["PrepTimeMins"],
+                   "CookTimeMins": theData["CookTimeMins"],
+                   "VideoUrl": theData["VideoUrl"],
+                   "NumReviews": theData["NumReviews"],
+                   "NumViews": theData["NumViews"],
+                   "NumShares": theData["NumShares"],
+                   "IsFeatured": theData["IsFeatured"],
+                   "ChefID": theData["ChefID"]}
                     
     reviews_query = """
         SELECT
@@ -319,13 +319,14 @@ def get_recipe_profile(recipe_id):
             r.ReviewText,
             r.ReviewDate
         FROM Review r
-        WHERE r.RecipeID = %s;
+        WHERE r.RecipeID = %s
         ORDER BY ReviewDate DESC;
     """            
-                    
-    cursor.execute(reviews_query, (recipe_id,))
-    reviews = cursor.fetchall()
-    cursor.close()
+
+    cursor2 = db.get_db().cursor()                
+    cursor2.execute(reviews_query, (recipe_id,))
+    reviews = cursor2.fetchall()
+    cursor2.close()
 
     reviews_info = [{"CookID": row["CookID"],
                      "Rating": row["Rating"],
@@ -333,7 +334,11 @@ def get_recipe_profile(recipe_id):
                      "ReviewDate": row["ReviewDate"]}
                      for row in reviews]
 
-    avg_rating = sum([review["Rating"] for review in reviews_info]) / len(reviews_info)
+    if reviews_info:
+        avg_rating = sum([review["Rating"] for review in reviews_info]) / len(reviews_info)
+    else:
+        avg_rating = 0
+    
     recipe_info["Reviews"] = reviews_info
     recipe_info["AvgRating"] = avg_rating    
 
@@ -355,20 +360,21 @@ def get_recipe_profile(recipe_id):
         ORDER BY TotalIngredientCalories DESC;
     """
 
-    cursor.execute(calories_query, (recipe_id,))
-    calories_info = cursor.fetchall()
-    cursor.close()
+    cursor3 = db.get_db().cursor()
+    cursor3.execute(calories_query, (recipe_id,))
+    calories_info = cursor3.fetchall()
+    cursor3.close()
 
     calories_info = [{"RecipeID": row["RecipeID"],
-                     "RecipeName": row["RecipeName"],
-                     "Servings": row["Servings"],
-                     "IngredientName": row["IngredientName"],
-                     "CalPerUnit": row["CalPerUnit"],
-                     "MeasureUnit": row["MeasureUnit"],
-                     "Quantity": row["Quantity"],
-                     "TotalIngredientCalories": row["TotalIngredientCalories"],
-                     "CaloriesPerServing": row["CaloriesPerServing"]}
-                     for row in calories_info]
+                      "RecipeName": row["RecipeName"],
+                      "Servings": row["Servings"],
+                      "IngredientName": row["IngredientName"],
+                      "CalPerUnit": row["CalPerUnit"],
+                      "MeasureUnit": row["MeasureUnit"],
+                      "Quantity": row["Quantity"],
+                      "TotalIngredientCalories": row["TotalIngredientCalories"],
+                      "CaloriesPerServing": row["CaloriesPerServing"]}
+                      for row in calories_info]
 
     recipe_info["Calories"] = calories_info         
 
