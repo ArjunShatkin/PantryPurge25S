@@ -387,3 +387,29 @@ def get_recipe_profile(recipe_id):
     the_response.status_code = 200
     the_response.mimetype = 'application/json'
     return the_response
+
+#------------------------------------------------------------
+# User Story 4.4
+@casual_cooks.route('/recipes/featured', methods=['GET'])
+def featured_recipes():
+    query = """
+        SELECT r.RecipeID, r.RecipeName, r.Description
+        FROM Recipe r
+        WHERE r.IsFeatured = 1
+        ORDER BY r.PublishDate DESC
+        LIMIT 5;
+    """
+
+    current_app.logger.info('GET /recipes/featured route')
+    cursor = db.get_db().cursor()
+    cursor.execute(query)
+    theData = cursor.fetchall()
+    featured_recipes = [{"RecipeID": row["RecipeID"],
+                         "RecipeName": row["RecipeName"],
+                         "Description": row["Description"]}
+                         for row in theData]
+    cursor.close()
+    the_response = make_response(jsonify(featured_recipes))
+    the_response.status_code = 200
+    the_response.mimetype = 'application/json'
+    return the_response
