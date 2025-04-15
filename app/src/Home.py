@@ -57,31 +57,29 @@ if st.button("Act as Dave, Analyst",
     logger.info("Logging in as Data Analyst Persona")
     st.switch_page('pages/00_Pol_Strat_Home.py')
 
-if st.button('Act as Chef', 
+if st.button('Act as Anthony, Professional Chef', 
             type = 'primary', 
             use_container_width=True):
     st.session_state['authenticated'] = True
-    st.session_state['role'] = 'usaid_worker'
-    st.session_state['first_name'] = 'Mohammad'
-    st.switch_page('pages/10_USAID_Worker_Home.py')
+    st.session_state['role'] = 'Professional Chef'
+    st.session_state['first_name'] = 'Anthony'
+    st.switch_page('pages/ProChef_Home.py')
 
 if st.button('Act as Jack, Casual Cook', 
             type = 'primary', 
             use_container_width=True):
     st.session_state['authenticated'] = True
-    st.session_state['role'] = 'administrator'
-    st.session_state['first_name'] = 'Casual Cook'
-    st.switch_page('pages/casual_cook_home.py')
+    st.session_state['role'] = 'casual_cook'
+    st.session_state['first_name'] = 'Jack, Casual Cook'
+    st.switch_page('pages/CC_Home.py')
 
 if st.button('Act as Jane, System Administrator', 
             type = 'primary', 
             use_container_width=True):
     st.session_state['authenticated'] = True
     st.session_state['role'] = 'administrator'
-    st.session_state['first_name'] = 'SysAdmin'
+    st.session_state['first_name'] = 'Jane- System Admin'
     st.switch_page('pages/system_admin_home.py')
-
-
 
 
 

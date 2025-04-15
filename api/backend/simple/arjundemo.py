@@ -4,6 +4,7 @@ from flask import jsonify
 from flask import make_response
 from flask import current_app
 from backend.db_connection import db
+import json
 
 recipes = Blueprint('recipes', __name__)
 chefs = Blueprint('chefs', __name__)
@@ -18,6 +19,7 @@ def create_recipe():
     data = request.json
 
     recipe_name = data.get('RecipeName')
+    chef_id = data.get('ChefID')
     servings = data.get('Servings', 4)
     difficulty = data.get('Difficulty', 'Medium')
     calories = data.get('Calories', 0)
@@ -26,6 +28,7 @@ def create_recipe():
     prep_time_mins = data.get('PrepTimeMins', 30)
     cook_time_mins = data.get('CookTimeMins', 45)
     publish_date = data.get('PublishDate', '2025-01-01')
+    video_url = data.get('VideoUrl','')
 
     # Required field validation
     if not recipe_name:
@@ -36,11 +39,11 @@ def create_recipe():
 
         query = '''
             INSERT INTO recipes (
-                RecipeName, Servings, Difficulty, Calories, 
+                RecipeName, ChefID, Servings, Difficulty, Calories, 
                 Description, Cuisine, PrepTimeMins, CookTimeMins, 
-                PublishDate
+                PublishDate, VideoUrl
             )
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             RETURNING RecipeID;
         '''
         values = (
@@ -212,3 +215,39 @@ def get_chefs_in_same_state(chef_id):
     except Exception as e:
         db.get_db().rollback()
         return jsonify({"error": str(e)}), 500
+
+
+@recipes.route('/chefs/<int:chef_id>/recipes', methods=['GET'])
+def get_chef_recipes(chef_id):
+    try:
+        # Connect and create a cursor
+        conn = db.get_db()
+        cursor = conn.cursor()
+
+        # Safe, simple query
+        cursor.execute("""
+            SELECT 
+                RecipeID, RecipeName, NumShares, NumViews, NumReviews, 
+                IsFeatured, PublishDate
+            FROM Recipe
+            WHERE ChefID = %s
+        """, (chef_id,))
+
+        # Fetch rows
+        rows = cursor.fetchall()
+        columns = [desc[0] for desc in cursor.description]
+
+        # Convert rows to list of dictionaries
+        recipes_list = [dict(zip(columns, row)) for row in rows]
+
+        # Create proper JSON response
+        response = make_response(jsonify(recipes_list))
+        response.mimetype = 'application/json'
+        response.status_code = 200
+        return response
+
+    except Exception as e:
+        # Fail safe
+        print("Error:", str(e))
+        return jsonify({"error": "Something went wrong."}), 500
+        
