@@ -214,3 +214,39 @@ def get_chefs_in_same_state(chef_id):
     except Exception as e:
         db.get_db().rollback()
         return jsonify({"error": str(e)}), 500
+
+
+@recipes.route('/chefs/<int:chef_id>/recipes', methods=['GET'])
+def get_chef_recipes(chef_id):
+    current_app.logger.info(f'GET /chefs/{chef_id}/recipes route')
+
+    try:
+        # Create a cursor to interact with the database
+        cursor = db.get_db().cursor()
+
+        # SQL query to fetch recipes for a specific chef and their performance metrics
+        query = '''
+            SELECT 
+                RecipeID, RecipeName, NumShares, NumViews, NumReviews, 
+                IsFeatured, PublishDate
+            FROM Recipe
+            WHERE ChefID = %s
+        '''
+        cursor.execute(query, (chef_id,))
+        recipes_data = cursor.fetchall()
+
+        # Check if no recipes were found
+        if not recipes_data:
+            return jsonify({"error": "No recipes found for this chef."}), 404
+
+        # Format the result as a list of dictionaries (one for each recipe)
+        columns = [desc[0] for desc in cursor.description]
+        recipes_list = [dict(zip(columns, row)) for row in recipes_data]
+
+        # Return the list of recipes with their performance metrics
+        return jsonify(recipes_list), 200
+
+    except Exception as e:
+        # Rollback in case of error
+        db.get_db().rollback()
+        return jsonify({"error": str(e)}), 500
