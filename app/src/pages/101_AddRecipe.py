@@ -9,7 +9,6 @@ st.title("Create A New Recipe Here")
 st.write("# Create A Recipe")
 
 with st.form("New Issue"):
-  recipe_id = st.number_input("Input Recipe ID:", step=1)
   chef_id = st.number_input("Input Your Chef ID:", step=1)
   servings = st.selectbox("Enter the number of servings:",[i for i in range(20)])
   difficulty = st.selectbox("Enter the diffiulty level:",['Easy','Medium','Hard'])
@@ -25,7 +24,6 @@ with st.form("New Issue"):
 
   if submission:
     data = {}
-    data['RecipeID'] = recipe_id
     data['ChefID'] = chef_id
     data ['Servings'] = servings
     data ['Difficulty'] = difficulty
@@ -45,3 +43,4 @@ with st.form("New Issue"):
             st.success(f"Successfully submitted new recipe")
     else:
         st.error(f"Failed to submit new recipe. Status code: {response.status_code}")
+        st.json(response.json())
