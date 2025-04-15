@@ -190,40 +190,29 @@ def submit_recipe_for_newsletter(recipe_id):
 
 
 
-@chefs.route('/chefs/<int:chef_id>/region', methods=['GET'])
-def get_chefs_in_same_state(chef_id):
-    current_app.logger.info(f'GET /chefs/{chef_id}/region route')
+@chefs.route('/chefs/region/<string:country_name>', methods=['GET'])
+def get_chefs_in_given_country(country_name):
+    current_app.logger.info(f'GET /chefs/region/{country_name} route')
 
     try:
         cursor = db.get_db().cursor()
 
-        # Step 1: Get the state of the current chef
-        cursor.execute("SELECT StateName FROM Chef WHERE ChefID = %s", (chef_id,))
-        result = cursor.fetchone()
-
-        if not result or not result[0]:
-            return jsonify({"error": "Chef not found or state information missing"}), 404
-
-        state = result[0]
-
-        # Step 2: Find other chefs in the same state (excluding the current chef)
+        # Step 1: Find chefs in the provided country
         query = """
-            SELECT ChefID, FirstName, LastName, CuisineSpecialty, YearsExp, City, StateName, Country
+            SELECT ChefID, FirstName, LastName, CuisineSpecialty, YearsExp, City, Country
             FROM Chef
-            WHERE StateName = %s AND ChefID != %s;
+            WHERE Country = %s;
         """
-        cursor.execute(query, (state, chef_id))
+        cursor.execute(query, (country_name,))
         chefs = cursor.fetchall()
-
-        # Step 3: Format the result as JSON
-        columns = [desc[0] for desc in cursor.description]
-        chef_list = [dict(zip(columns, row)) for row in chefs]
-
-        return jsonify(chef_list), 200
+        
+        #  Return the list of chefs in the given country
+        return jsonify(chefs), 200
 
     except Exception as e:
         db.get_db().rollback()
         return jsonify({"error": str(e)}), 500
+
 
 
 @recipes.route('/chefs/<int:chef_id>/recipes', methods=['GET'])
