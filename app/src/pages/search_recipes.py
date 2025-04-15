@@ -32,9 +32,9 @@ if st.button("Search"):
     used_filters = {}
     if prep_time_max > 0:
         used_filters["prep_time_max"] = prep_time_max
-    if cuisine:
+    if cuisine.strip():
         used_filters["cuisine"] = cuisine.strip()
-    if diet_rest:
+    if diet_rest.strip():
         used_filters["diet_rest"] = diet_rest.strip()
 
     if used_filters:
@@ -58,5 +58,8 @@ if st.button("Search"):
         for recipe in search_results:
             st.write(f"- {recipe['RecipeName']}")
             st.write(f"  Description: {recipe['Description']}")
+            if st.button("View Recipe", key=f"view_{recipe['RecipeID']}"):
+                st.session_state["selected_id"] = recipe["RecipeID"]
+                #st.switch_page("pages/recipe_profile.py")  
     else:
         st.write("No recipes in database.")
