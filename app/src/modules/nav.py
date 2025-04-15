@@ -38,7 +38,7 @@ def ApiTestNav():
 
 def PredictionNav():
     st.sidebar.page_link(
-        "pages/11_Prediction_Test.py", label="Regression Prediction", icon="📈"
+        "pages/11_Prediction_Test.py", label="Regression Prediction", icon="🏦"
     )
 
 
@@ -50,10 +50,11 @@ def ClassificationNav():
 
 #### ------------------------ System Admin Role ------------------------
 def AdminPageNav():
-    st.sidebar.page_link("pages/20_Admin_Home.py", label="System Admin", icon="🖥️")
-    st.sidebar.page_link(
-        "pages/21_ML_Model_Mgmt.py", label="ML Model Management", icon="🏢"
-    )
+    st.sidebar.page_link("pages/system_admin_home.py", label="Admin Home", icon="🏦")
+    st.sidebar.page_link("pages/users.py", label="Users", icon="👤")
+    st.sidebar.page_link("pages/systems_issues.py", label="Issues", icon="🖥️")
+    
+    
 
 #### ------------------------ Casual Cook Role ------------------------
 def CCPageNav():
@@ -98,6 +99,7 @@ def SideBarLinks(show_home=False):
         # If the user is an administrator, give them access to the administrator pages
         if st.session_state["role"] == "administrator":
             AdminPageNav()
+            
 
         if st.session_state["role"] == "casual_cook":
             CCPageNav()

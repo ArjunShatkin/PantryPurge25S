@@ -46,8 +46,12 @@ if st.button("Search"):
     if ingredients_results and filter_results:
         found_ids = {recipe['RecipeID'] for recipe in filter_results}
         search_results = [recipe for recipe in ingredients_results if recipe['RecipeID'] in found_ids]
-    else:
+    elif filter_results:
+        search_results = filter_results
+    elif ingredients_results:
         search_results = ingredients_results
+    else:
+        search_results = []
 
     if search_results:
         st.write("Search Results:")

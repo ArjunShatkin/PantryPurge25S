@@ -4,6 +4,8 @@ from flask import jsonify
 from flask import make_response
 from flask import current_app
 from backend.db_connection import db
+import json
+import traceback
 
 recipes = Blueprint('recipes', __name__)
 chefs = Blueprint('chefs', __name__)
@@ -18,6 +20,7 @@ def create_recipe():
     data = request.json
 
     recipe_name = data.get('RecipeName')
+    chef_id = data.get('ChefID')
     servings = data.get('Servings', 4)
     difficulty = data.get('Difficulty', 'Medium')
     calories = data.get('Calories', 0)
@@ -26,6 +29,7 @@ def create_recipe():
     prep_time_mins = data.get('PrepTimeMins', 30)
     cook_time_mins = data.get('CookTimeMins', 45)
     publish_date = data.get('PublishDate', '2025-01-01')
+    video_url = data.get('VideoUrl','')
 
     # Required field validation
     if not recipe_name:
@@ -36,11 +40,11 @@ def create_recipe():
 
         query = '''
             INSERT INTO recipes (
-                RecipeName, Servings, Difficulty, Calories, 
+                RecipeName, ChefID, Servings, Difficulty, Calories, 
                 Description, Cuisine, PrepTimeMins, CookTimeMins, 
-                PublishDate
+                PublishDate, VideoUrl
             )
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             RETURNING RecipeID;
         '''
         values = (
@@ -142,8 +146,11 @@ newsletter_routes = Blueprint('newsletter_routes', __name__)
 def submit_recipe_for_newsletter(recipe_id):
     current_app.logger.info(f'POST /recipes/{recipe_id}/newsletter route')
 
-    data = request.json
+    data = request.get_json()
+    current_app.logger.debug(f"Received data: {data}")  # Log incoming data
+    
     chef_id = data.get('ChefID')
+    
     sub_status = data.get('SubStatus', 'Pending')
     sub_date = datetime.now()
 
@@ -170,12 +177,15 @@ def submit_recipe_for_newsletter(recipe_id):
             "ChefID": chef_id,
             "RecipeID": recipe_id,
             "SubStatus": sub_status,
-            "SubDate": sub_date
-        }), 201
+            "SubDate": sub_date.isoformat()
+        }), 200
 
     except Exception as e:
         db.get_db().rollback()
+        current_app.logger.error(f"Exception: {e}")
+        traceback.print_exc()
         return jsonify({"error": str(e)}), 500
+
 
 
 @chefs.route('/chefs/<int:chef_id>/region', methods=['GET'])
@@ -212,3 +222,58 @@ def get_chefs_in_same_state(chef_id):
     except Exception as e:
         db.get_db().rollback()
         return jsonify({"error": str(e)}), 500
+
+
+@recipes.route('/chefs/<int:chef_id>/recipes', methods=['GET'])
+def get_chef_recipes(chef_id):
+    try:
+        # Connect and create a cursor
+        conn = db.get_db()
+        cursor = conn.cursor()
+
+        # Safe, simple query
+        cursor.execute("""
+            SELECT 
+                RecipeID, RecipeName, NumShares, NumViews, NumReviews, 
+                IsFeatured, PublishDate
+            FROM Recipe
+            WHERE ChefID = %s
+        """, (chef_id,))
+
+        # Fetch rows
+        rows = cursor.fetchall()
+        columns = [desc[0] for desc in cursor.description]
+
+        # Convert rows to list of dictionaries
+        recipes_list = [dict(zip(columns, row)) for row in rows]
+
+        # Create proper JSON response
+        response = make_response(jsonify(recipes_list))
+        response.mimetype = 'application/json'
+        response.status_code = 200
+        return response
+
+    except Exception as e:
+        # Fail safe
+        print("Error:", str(e))
+        return jsonify({"error": "Something went wrong."}), 500
+
+@recipes.route('/recipes/<int:recipe_id>/del', methods=['DELETE'])
+def delete_recipe(recipe_id):
+    current_app.logger.info(f'DELETE /recipes/{recipe_id} route')
+
+    try:
+        cursor = db.get_db().cursor()
+
+        # Delete the recipe
+        cursor.execute("DELETE FROM Recipe WHERE RecipeID = %s;", (recipe_id,))
+        db.get_db().commit()
+
+        return jsonify({"message": f"Recipe with ID {recipe_id} successfully deleted."}), 200
+
+    except Exception as e:
+        db.get_db().rollback()
+        current_app.logger.error(f"Error deleting recipe: {e}")
+        return jsonify({"error": str(e)}), 500
+
+        

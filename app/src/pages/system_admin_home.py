@@ -16,7 +16,7 @@ if st.button('Issues',
              use_container_width=True):
   st.switch_page('pages/systems_issues.py')
 
-if st.button('View All Users', 
+if st.button('Users', 
              type='primary',
              use_container_width=True):
-  st.switch_page('pages/all_users.py')
+  st.switch_page('pages/users.py')
