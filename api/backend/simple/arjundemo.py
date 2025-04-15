@@ -6,6 +6,7 @@ from flask import current_app
 from backend.db_connection import db
 import json
 import traceback
+import datetime
 
 recipes = Blueprint('recipes', __name__)
 chefs = Blueprint('chefs', __name__)
@@ -152,7 +153,7 @@ def submit_recipe_for_newsletter(recipe_id):
     chef_id = data.get('ChefID')
     
     sub_status = data.get('SubStatus', 'Pending')
-    sub_date = datetime.now()
+    sub_date = datetime.datetime.now()
 
     if not chef_id:
         return jsonify({"error": "ChefID is required."}), 400
@@ -162,12 +163,12 @@ def submit_recipe_for_newsletter(recipe_id):
 
         query = '''
             INSERT INTO Newsletter (ChefID, RecipeID, SubStatus, SubDate)
-            VALUES (%s, %s, %s, %s)
-            RETURNING SubID;
+            VALUES (%s, %s, %s, %s);
         '''
         values = (chef_id, recipe_id, sub_status, sub_date)
         cursor.execute(query, values)
-        sub_id = cursor.fetchone()[0]
+        
+        sub_id = cursor.lastrowid
 
         db.get_db().commit()
 
@@ -185,43 +186,33 @@ def submit_recipe_for_newsletter(recipe_id):
         current_app.logger.error(f"Exception: {e}")
         traceback.print_exc()
         return jsonify({"error": str(e)}), 500
+        # return jsonify({sub_id}), 500
 
 
 
-@chefs.route('/chefs/<int:chef_id>/region', methods=['GET'])
-def get_chefs_in_same_state(chef_id):
-    current_app.logger.info(f'GET /chefs/{chef_id}/region route')
+@chefs.route('/chefs/region/<string:country_name>', methods=['GET'])
+def get_chefs_in_given_country(country_name):
+    current_app.logger.info(f'GET /chefs/region/{country_name} route')
 
     try:
         cursor = db.get_db().cursor()
 
-        # Step 1: Get the state of the current chef
-        cursor.execute("SELECT StateName FROM Chef WHERE ChefID = %s", (chef_id,))
-        result = cursor.fetchone()
-
-        if not result or not result[0]:
-            return jsonify({"error": "Chef not found or state information missing"}), 404
-
-        state = result[0]
-
-        # Step 2: Find other chefs in the same state (excluding the current chef)
+        # Step 1: Find chefs in the provided country
         query = """
-            SELECT ChefID, FirstName, LastName, CuisineSpecialty, YearsExp, City, StateName, Country
+            SELECT ChefID, FirstName, LastName, CuisineSpecialty, YearsExp, City, Country
             FROM Chef
-            WHERE StateName = %s AND ChefID != %s;
+            WHERE Country = %s;
         """
-        cursor.execute(query, (state, chef_id))
+        cursor.execute(query, (country_name,))
         chefs = cursor.fetchall()
-
-        # Step 3: Format the result as JSON
-        columns = [desc[0] for desc in cursor.description]
-        chef_list = [dict(zip(columns, row)) for row in chefs]
-
-        return jsonify(chef_list), 200
+        
+        #  Return the list of chefs in the given country
+        return jsonify(chefs), 200
 
     except Exception as e:
         db.get_db().rollback()
         return jsonify({"error": str(e)}), 500
+
 
 
 @recipes.route('/chefs/<int:chef_id>/recipes', methods=['GET'])
@@ -242,13 +233,9 @@ def get_chef_recipes(chef_id):
 
         # Fetch rows
         rows = cursor.fetchall()
-        columns = [desc[0] for desc in cursor.description]
-
-        # Convert rows to list of dictionaries
-        recipes_list = [dict(zip(columns, row)) for row in rows]
 
         # Create proper JSON response
-        response = make_response(jsonify(recipes_list))
+        response = make_response(jsonify(rows))
         response.mimetype = 'application/json'
         response.status_code = 200
         return response
@@ -263,11 +250,16 @@ def delete_recipe(recipe_id):
     current_app.logger.info(f'DELETE /recipes/{recipe_id} route')
 
     try:
-        cursor = db.get_db().cursor()
+        conn = db.get_db()
+        cursor = conn.cursor()
 
-        # Delete the recipe
+        # Then delete the recipe itself
         cursor.execute("DELETE FROM Recipe WHERE RecipeID = %s;", (recipe_id,))
-        db.get_db().commit()
+
+        # First delete related entries in Newsletter
+        cursor.execute("DELETE FROM Newsletter WHERE RecipeID = %s;", (recipe_id,))
+
+        conn.commit()
 
         return jsonify({"message": f"Recipe with ID {recipe_id} successfully deleted."}), 200
 
@@ -275,5 +267,6 @@ def delete_recipe(recipe_id):
         db.get_db().rollback()
         current_app.logger.error(f"Error deleting recipe: {e}")
         return jsonify({"error": str(e)}), 500
+
 
         

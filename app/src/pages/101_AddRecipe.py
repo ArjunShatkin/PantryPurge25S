@@ -4,8 +4,7 @@ from modules.nav import SideBarLinks
 
 SideBarLinks()
 
-st.title("Welcome Professional Chef, Anthony")
-st.write("Welcome to the Professional Chef Home Page!")
+st.title("Create A New Recipe Here")
 
 st.write("# Create A Recipe")
 
@@ -40,4 +39,9 @@ with st.form("New Issue"):
 
     st.write(data)
 
-    requests.post('http://api:4000/r/recipes', json=data)
+    response = requests.post('http://api:4000/r/recipes', json=data)
+
+    if response.status_code == 200:
+            st.success(f"Successfully submitted new recipe")
+    else:
+        st.error(f"Failed to submit new recipe. Status code: {response.status_code}")

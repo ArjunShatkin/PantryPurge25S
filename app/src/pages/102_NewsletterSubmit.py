@@ -1,6 +1,8 @@
 import streamlit as st
 import requests
-from datetime import datetime
+import pandas as pd
+from streamlit_extras.app_logo import add_logo
+from modules.nav import SideBarLinks
 
 with st.form("New Issue"):
   chef_id = st.text_input("Chef ID")
@@ -19,7 +21,6 @@ if submission:
     response = requests.post(f'http://api:4000/r/recipes/{int(recipe_id)}/newsletter', json=data)
     
     if response.status_code == 200:
-            st.success(f"Successfully deleted recipe with ID {recipe_id}.")
+            st.success(f"Successfully submitted newsletter with for Recipe ID {recipe_id}.")
     else:
         st.error(f"Failed to submit newsletter. Status code: {response.status_code}")
-        st.json(response.json())

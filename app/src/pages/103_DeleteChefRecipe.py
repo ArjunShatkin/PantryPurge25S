@@ -22,4 +22,4 @@ if submission:
             st.success(f"Successfully deleted recipe with ID {recipe_id}.")
     else:
         st.error(f"Failed to delete recipe. Status code: {response.status_code}")
-        st.json(response.json())  # Show the error message from the backend
+        st.json(response.json())

@@ -81,7 +81,8 @@ CREATE TABLE IF NOT EXISTS RecipeIngredient (
     IngredientID int NOT NULL,
     Quantity decimal(8, 2),
     PRIMARY KEY (RecipeID, IngredientID),
-    FOREIGN KEY (RecipeID) REFERENCES Recipe (RecipeID),
+    FOREIGN KEY (RecipeID) REFERENCES Recipe (RecipeID)
+    ON DELETE CASCADE,
     FOREIGN KEY (IngredientID) REFERENCES Ingredient (IngredientID),
     INDEX idx_recipeId (RecipeID),
     INDEX idx_ingredientId (IngredientID)
@@ -117,7 +118,7 @@ CREATE TABLE IF NOT EXISTS Review (
     ReviewText varchar(800),
     ReviewDate date,
     FOREIGN KEY (CookID) REFERENCES CasualCook (CookID),
-    FOREIGN KEY (RecipeID) REFERENCES Recipe (RecipeID),
+    FOREIGN KEY (RecipeID) REFERENCES Recipe (RecipeID) ON DELETE CASCADE,
     PRIMARY KEY (CookID, RecipeID),
     INDEX idx_cookId (CookID),
     INDEX idx_recipeId (RecipeID)
@@ -129,7 +130,7 @@ CREATE TABLE IF NOT EXISTS Shares (
     SharePlatform varchar(20),
     ShareDate date,
     FOREIGN KEY (CookID) REFERENCES CasualCook (CookID),
-    FOREIGN KEY (RecipeID) REFERENCES Recipe (recipeID),
+    FOREIGN KEY (RecipeID) REFERENCES Recipe (recipeID) ON DELETE CASCADE,
     PRIMARY KEY (CookID, RecipeID),
     INDEX idx_cookId (CookID),
     INDEX idx_recipeId (RecipeID)
@@ -141,10 +142,12 @@ CREATE TABLE IF NOT EXISTS OffsiteTraffic (
     SrcName  varchar(20),
     DateTracked date,
     ClickCount int,
-    -- What is click count?
-    FOREIGN KEY (RecipeID) references Recipe (RecipeID),
+    FOREIGN KEY (RecipeID) 
+        REFERENCES Recipe (RecipeID) 
+        ON DELETE CASCADE,
     UNIQUE INDEX uq_idx_trafficId (TrafficID)
 );
+
 
 CREATE TABLE IF NOT EXISTS Endorses (
     EndorsingChefID int NOT NULL,
@@ -237,10 +240,10 @@ CREATE TABLE IF NOT EXISTS DietRecipe (
 CREATE TABLE IF NOT EXISTS Newsletter (
     ChefID int,
     RecipeID int,
-    SubID int PRIMARY KEY NOT NULL,
+    SubID int PRIMARY KEY AUTO_INCREMENT,
     SubStatus varchar(30),
     SubDate datetime,
-    FOREIGN KEY (ChefID) REFERENCES Chef (ChefID),
-    FOREIGN KEY (RecipeID) REFERENCES Recipe (RecipeID)
+    FOREIGN KEY (ChefID) REFERENCES Chef (ChefID) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (RecipeID) REFERENCES Recipe (RecipeID) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
