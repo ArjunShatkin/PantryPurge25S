@@ -18,6 +18,7 @@ def create_recipe():
     data = request.json
 
     recipe_name = data.get('RecipeName')
+    chef_id = data.get('ChefID')
     servings = data.get('Servings', 4)
     difficulty = data.get('Difficulty', 'Medium')
     calories = data.get('Calories', 0)
@@ -26,6 +27,7 @@ def create_recipe():
     prep_time_mins = data.get('PrepTimeMins', 30)
     cook_time_mins = data.get('CookTimeMins', 45)
     publish_date = data.get('PublishDate', '2025-01-01')
+    video_url = data.get('VideoUrl','')
 
     # Required field validation
     if not recipe_name:
@@ -36,11 +38,11 @@ def create_recipe():
 
         query = '''
             INSERT INTO recipes (
-                RecipeName, Servings, Difficulty, Calories, 
+                RecipeName, ChefID, Servings, Difficulty, Calories, 
                 Description, Cuisine, PrepTimeMins, CookTimeMins, 
-                PublishDate
+                PublishDate, VideoUrl
             )
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             RETURNING RecipeID;
         '''
         values = (
