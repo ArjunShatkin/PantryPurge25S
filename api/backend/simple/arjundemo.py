@@ -40,27 +40,27 @@ def create_recipe():
         cursor = db.get_db().cursor()
 
         query = '''
-            INSERT INTO recipes (
+            INSERT INTO Recipe (
                 RecipeName, ChefID, Servings, Difficulty, Calories, 
                 Description, Cuisine, PrepTimeMins, CookTimeMins, 
                 PublishDate, VideoUrl
             )
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-            RETURNING RecipeID;
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
         '''
         values = (
-            recipe_name, servings, difficulty, calories,
-            description, cuisine, prep_time_mins, cook_time_mins, publish_date
+            recipe_name, chef_id, servings, difficulty, calories,
+            description, cuisine, prep_time_mins, cook_time_mins, publish_date, video_url
         )
 
         cursor.execute(query, values)
-        new_id = cursor.fetchone()[0]
+        new_id = cursor.lastrowid
+
         db.get_db().commit()
 
         return jsonify({
             "message": "Recipe created successfully.",
             "recipe_id": new_id
-        }), 201
+        }), 200
 
     except Exception as e:
         db.get_db().rollback()
