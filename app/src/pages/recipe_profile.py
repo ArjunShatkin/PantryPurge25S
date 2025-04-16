@@ -24,6 +24,7 @@ if response.status_code == 200:
     left_column.write(f"Servings: {data.get('Servings')}")
     left_column.write(f"Prep Time (mins): {data.get('PrepTimeMins')}")
     left_column.write(f"Cook Time (mins): {data.get('CookTimeMins')}")
+    left_column.write(f"Average Rating: {data.get('AvgRating')}")
 
     right_column.write(f"Number of Views: {data.get('NumViews')}")
     right_column.write(f"Number of Shares: {data.get('NumShares')}")
@@ -56,12 +57,14 @@ if response.status_code == 200:
         if adjusted_data:
             adjusted_calories = []
             for ingredient in adjusted_data:
+                total_ingredient_calories = round(row.get("CalPerUnit") * ingredient.get("AdjustedQuantity"), 2)
+                calories_per_serving = round(total_ingredient_calories / new_servings, 2)
                 adjusted_calories.append({"Ingredient:": ingredient.get("IngredientName"),
                                           "Cal/Unit:": row.get("CalPerUnit"),
                                           "Measure Unit:": ingredient.get("MeasureUnit"),
                                           "Quantity:": ingredient.get("AdjustedQuantity"),
-                                          "Total Ingredient Calories:": row.get("TotalIngredientCalories"),
-                                          "Calories Per Serving:": row.get("CaloriesPerServing")})
+                                          "Total Ingredient Calories:": total_ingredient_calories,
+                                          "Calories Per Serving:": calories_per_serving})
             df_adjusted = pd.DataFrame(adjusted_calories)
             caloric_placeholders.table(df_adjusted)
 
