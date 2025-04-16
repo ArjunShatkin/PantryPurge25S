@@ -2,6 +2,8 @@ import streamlit as st
 import requests
 from datetime import datetime
 
+st.title("Delete your Recipe")
+
 with st.form("Delete Chef Recipe"):
   chef_id = st.text_input("Chef ID")
   recipe_id = st.text_input("Recipe ID")

@@ -6,6 +6,7 @@ from modules.nav import SideBarLinks
 
 # Add sidebar links
 SideBarLinks()
+st.title("Search For Fellow Chef")
 
 st.write("Search For Chefs By Country")
 

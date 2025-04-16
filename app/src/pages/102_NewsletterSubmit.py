@@ -4,6 +4,8 @@ import pandas as pd
 from streamlit_extras.app_logo import add_logo
 from modules.nav import SideBarLinks
 
+st.title("Submit to Newsletter")
+
 with st.form("New Issue"):
   chef_id = st.text_input("Chef ID")
   recipe_id = st.text_input("Recipe ID")

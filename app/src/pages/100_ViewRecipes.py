@@ -16,13 +16,13 @@ chef_id = st.number_input("Enter Chef ID", step=1)
 if chef_id:
     url = f'http://api:4000/r/chefs/{int(chef_id)}/recipes'
     response = requests.get(url)
-    st.write(f"Raw API Response: {response.text}")
+    
 
     try:
         # Check if the response is successful
         if response.status_code == 200:
             recipes = response.json()
-            st.write(f"Received recipes: {recipes}")
+            
             st.dataframe(recipes)
         else:
             st.write(f"Error: {response.status_code} - {response.json().get('error', 'Unknown error')}")
