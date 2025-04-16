@@ -68,9 +68,6 @@ def create_recipe():
 
 
 
-# This blueprint will handle routes related to Newsletter submissions
-newsletter_routes = Blueprint('newsletter_routes', __name__)
-
 # ------------------------------------------------------------
 # /newsletter: Post a recipe to be considered for the newsletter
 # ------------------------------------------------------------
