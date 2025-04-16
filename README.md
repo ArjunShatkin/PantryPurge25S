@@ -18,11 +18,6 @@ Currently, there are three major components that will each run in their own Dock
 - Flask REST api in the `./api` directory
 - MySQL Database that will be initialized with SQL script files from the `./database-files` directory
 
-## Dependencies?
-
-## Installation?
-
-## Usage? (how to use, GUI features)
 
 ## Suggestion for Learning the Project Code Base
 
@@ -45,39 +40,14 @@ If you are not familiar with web app development, this code base might be confus
    1. `docker compose -f docker-compose-testing.yaml up db -d` only start the database container (replace db with api or app for the other two services as needed)
    1. `docker compose -f docker-compose-testing.yaml stop` to "turn off" the containers but not delete them.
 
-### Setting Up Your Team's Repo
-
-**Before you start**: As a team, one person needs to assume the role of _Team Project Repo Owner_.
-
-1. The Team Project Repo Owner needs to fork this template repo into their own GitHub account **and give the repo a name consistent with your project's name**. If you're worried that the repo is public, don't. Every team is doing a different project.
-1. In the newly forked team repo, the Team Project Repo Owner should go to the **Settings** tab, choose **Collaborators and Teams** on the left-side panel. Add each of your team members to the repository with Write access.
-
-**Remaining Team Members**
-
-1. Each of the other team members will receive an invitation to join. Obviously accept the invite.
-1. Once that process is complete, each team member, including the repo owner, should clone the Team's Repo to their local machines (in a different location your Personal Project Repo).
-1. Set up the `.env` file in the `api` folder based on the `.env.template` file.
-1. For running the testing containers (for your team's repo):
-   1. `docker compose up -d` to start all the containers in the background
-   1. `docker compose down` to shutdown and delete the containers
-   1. `docker compose up db -d` only start the database container (replace db with api or app for the other two services as needed)
-   1. `docker compose stop` to "turn off" the containers but not delete them.
-
-**Note:** You can also use the Docker Desktop GUI to start and stop the containers after the first initial run.
 
 ## Handling User Role Access and Control
 
-In most applications, when a user logs in, they assume a particular role. For instance, when one logs in to a stock price prediction app, they may be a single investor, a portfolio manager, or a corporate executive (of a publicly traded company). Each of those _roles_ will likely present some similar features as well as some different features when compared to the other roles. So, how do you accomplish this in Streamlit? This is sometimes called Role-based Access Control, or **RBAC** for short.
+In most applications, when a user logs in, they assume a particular role. For instance, when one logs in to Pantry Purge, they can be a casual cook, a professional chef, analyst, or a system admin.
+Each of those _roles_ will likely present some similar features as well as some different features when compared to the other roles. 
 
 The code in this project demonstrates how to implement a simple RBAC system in Streamlit but without actually using user authentication (usernames and passwords). The Streamlit pages from the original template repo are split up among 3 roles - Political Strategist, USAID Worker, and a System Administrator role (this is used for any sort of system tasks such as re-training ML model, etc.). It also demonstrates how to deploy an ML model.
 
 Wrapping your head around this will take a little time and exploration of this code base. Some highlights are below.
 
-### Getting Started with the RBAC
-
-1. We need to turn off the standard panel of links on the left side of the Streamlit app. This is done through the `app/src/.streamlit/config.toml` file. So check that out. We are turning it off so we can control directly what links are shown.
-1. Then I created a new python module in `app/src/modules/nav.py`. When you look at the file, you will see that there are functions for basically each page of the application. The `st.sidebar.page_link(...)` adds a single link to the sidebar. We have a separate function for each page so that we can organize the links/pages by role.
-1. Next, check out the `app/src/Home.py` file. Notice that there are 3 buttons added to the page and when one is clicked, it redirects via `st.switch_page(...)` to that Roles Home page in `app/src/pages`. But before the redirect, I set a few different variables in the Streamlit `session_state` object to track role, first name of the user, and that the user is now authenticated.
-1. Notice near the top of `app/src/Home.py` and all other pages, there is a call to `SideBarLinks(...)` from the `app/src/nav.py` module. This is the function that will use the role set in `session_state` to determine what links to show the user in the sidebar.
-1. The pages are organized by Role. Pages that start with a `0` are related to the _Political Strategist_ role. Pages that start with a `1` are related to the _USAID worker_ role. And, pages that start with a `2` are related to The _System Administrator_ role.
 
