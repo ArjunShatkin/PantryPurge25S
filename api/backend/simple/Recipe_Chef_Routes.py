@@ -127,7 +127,7 @@ def get_chefs_in_given_country(country_name):
     try:
         cursor = db.get_db().cursor()
 
-        # Step 1: Find chefs in the provided country
+        # Find chefs in the provided country
         query = """
             SELECT ChefID, FirstName, LastName, CuisineSpecialty, YearsExp, City, Country
             FROM Chef
@@ -152,7 +152,6 @@ def get_chef_recipes(chef_id):
         conn = db.get_db()
         cursor = conn.cursor()
 
-        # Safe, simple query
         cursor.execute("""
             SELECT 
                 RecipeID, RecipeName, NumShares, NumViews, NumReviews, 
@@ -199,4 +198,43 @@ def delete_recipe(recipe_id):
         return jsonify({"error": str(e)}), 500
 
 
-        
+
+@recipes.route('/recipes/ingredient', methods=['POST'])
+def add_ingredient():
+    current_app.logger.info(f'POST /recipes/ingredient route')
+
+
+    data = request.json
+
+    recipe_id = data.get('RecipeID')
+    ingredient_id = data.get('IngredientID')
+    quantity = data.get('Quantity', 1.0)
+
+    # Validate required fields
+    if not recipe_id or not ingredient_id:
+        return jsonify({"error": "RecipeID and IngredientID are required."}), 400
+
+    try:
+        cursor = db.get_db().cursor()
+
+        # Insert into RecipeIngredient
+        query = '''
+            INSERT INTO RecipeIngredient (
+                RecipeID, IngredientID, Quantity
+            )
+            VALUES (%s, %s, %s);
+        '''
+        values = (recipe_id, ingredient_id, quantity)
+
+        cursor.execute(query, values)
+        db.get_db().commit()
+
+        return jsonify({
+            "message": "Ingredient linked to recipe successfully.",
+            "recipe_id": recipe_id,
+            "ingredient_id": ingredient_id
+        }), 200
+
+    except Exception as e:
+        db.get_db().rollback()
+        return jsonify({"error": str(e)}), 500
