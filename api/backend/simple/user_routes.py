@@ -45,7 +45,7 @@ def new_user():
     user_name = user_info['Username']
     status = user_info['UserStatus']
 
-    query = 'UPDATE users SET user_name = %s,  status = %s where id = %s'
+    query = 'UPDATE users SET status = %s where id = %s'
     data = (user_name, status, user_id)
     cursor = db.get_db().cursor()
     r = cursor.execute(query, data)
