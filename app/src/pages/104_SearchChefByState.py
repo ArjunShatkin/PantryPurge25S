@@ -21,7 +21,6 @@ if country:
         
         if response.status_code == 200:
             chefs = response.json()
-            st.write(chefs)
 
             # Check if there are chefs in the country
             if chefs:
