@@ -211,6 +211,7 @@ def delete_recipe(recipe_id):
 # ------------------------------------------------------------
 # Add an Ingredient to A recipe -- Part 2 of User Story 3.6
 # ------------------------------------------------------------
+
 @recipes.route('/recipes/ingredient', methods=['POST'])
 def add_ingredient():
     current_app.logger.info(f'POST /recipes/ingredient route')
