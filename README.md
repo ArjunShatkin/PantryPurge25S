@@ -50,4 +50,8 @@ The code in this project demonstrates how to implement a simple RBAC system in S
 
 Wrapping your head around this will take a little time and exploration of this code base. Some highlights are below.
 
+## Video Demonstration
+
+Our video demonstration of the website can be found here: https://drive.google.com/file/d/1SeldBIGuCjIwn1rUSjzvUVfKF08ql5U5/view?usp=drive_link
+
 
