@@ -16,7 +16,7 @@ with st.form("Edit Issue"):
 
 if submitted:
   data = {}
-  data['UserID'] = user_id
+  data['UserId'] = user_id
   data ['Username'] = name
   data ['UserStatus'] = Status
   st.write(data)
