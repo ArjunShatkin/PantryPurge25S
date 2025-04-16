@@ -2,8 +2,8 @@ from flask import Flask
 
 from backend.db_connection import db
 from backend.simple.user_routes import users
-from backend.simple.arjundemo import recipes
-from backend.simple.arjundemo import chefs
+from backend.simple.Recipe_Chef_Routes import recipes
+from backend.simple.Recipe_Chef_Routes import chefs
 from backend.simple.user_routes import issues
 from backend.casual_cooks.chancedemo import casual_cooks
 from backend.analysts.analyst_routes import analysts
