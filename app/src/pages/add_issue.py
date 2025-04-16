@@ -9,9 +9,9 @@ st.write("# New Issue")
 
 
 with st.form("Edit Issue"):
-  issue_id = st.text_input("Input Issue ID:")
-  user = st.text_input("Input User ID:")
-  time = st.text_input("Enter the Time:")
+  issue_id = st.number_input("Input Issue ID:")
+  user = st.number_input("Input User ID:")
+  time = st.date_input("Enter the Time:")
   Priority = st.text_input("Priority of the  Issue:")
   Status = st.text_input("Status of the Issue:")
   Title = st.text_input("Title the issue:")
