@@ -12,7 +12,8 @@ recipes = Blueprint('recipes', __name__)
 chefs = Blueprint('chefs', __name__)
 
 # ------------------------------------------------------------
-# POST /recipes - Create and publish a new recipe
+# POST /recipes - Create and publish a new recipe -- User Story 3.6
+# ------------------------------------------------------------
 
 @recipes.route('/recipes', methods=['POST'])
 def create_recipe():
@@ -69,9 +70,8 @@ def create_recipe():
 
 
 # ------------------------------------------------------------
-# /newsletter: Post a recipe to be considered for the newsletter
+# Post a recipe to be considered for the newsletter -- User Story 3.3
 # ------------------------------------------------------------
-# /recipes/<id>/newsletter: Submit a recipe for the newsletter
 
 @recipes.route('/recipes/<int:recipe_id>/newsletter', methods=['POST'])
 def submit_recipe_for_newsletter(recipe_id):
@@ -119,6 +119,9 @@ def submit_recipe_for_newsletter(recipe_id):
         # return jsonify({sub_id}), 500
 
 
+# ------------------------------------------------------------
+# Search for chef by country -- User Story 3.5
+# ------------------------------------------------------------
 
 @chefs.route('/chefs/region/<string:country_name>', methods=['GET'])
 def get_chefs_in_given_country(country_name):
@@ -144,6 +147,9 @@ def get_chefs_in_given_country(country_name):
         return jsonify({"error": str(e)}), 500
 
 
+# ------------------------------------------------------------
+# View a list of recipes for a given chef -- User Story 3.1
+# ------------------------------------------------------------
 
 @recipes.route('/chefs/<int:chef_id>/recipes', methods=['GET'])
 def get_chef_recipes(chef_id):
@@ -174,6 +180,9 @@ def get_chef_recipes(chef_id):
         print("Error:", str(e))
         return jsonify({"error": "Something went wrong."}), 500
 
+# ------------------------------------------------------------
+# Delete A Recipe
+# ------------------------------------------------------------
 @recipes.route('/recipes/<int:recipe_id>/del', methods=['DELETE'])
 def delete_recipe(recipe_id):
     current_app.logger.info(f'DELETE /recipes/{recipe_id} route')
@@ -199,6 +208,9 @@ def delete_recipe(recipe_id):
 
 
 
+# ------------------------------------------------------------
+# Add an Ingredient to A recipe -- Part 2 of User Story 3.6
+# ------------------------------------------------------------
 @recipes.route('/recipes/ingredient', methods=['POST'])
 def add_ingredient():
     current_app.logger.info(f'POST /recipes/ingredient route')
