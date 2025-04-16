@@ -134,7 +134,7 @@ def add_new_issue():
     Resolved = the_data ['ResolvedDate']
 
     query = f'''
-        INSERT INTO products (IssueID, UserID, EnteredTime, Priority, Status, Title, Description, ResolvedDate)
+        INSERT INTO Issue (IssueID, UserID, EnteredTime, Priority, Status, Title, Description, ResolvedDate)
         VALUES ('{issue_id}','{user}', '{time}', '{Priority}','{Status}', '{Title}', '{Description}','{Resolved}')
     '''
     # TODO: Make sure the version of the query above works properly
