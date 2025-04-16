@@ -6,7 +6,7 @@ from modules.nav import SideBarLinks
 
 st.title("Submit to Newsletter")
 
-with st.form("New Issue"):
+with st.form("Newsletter"):
   chef_id = st.text_input("Chef ID")
   recipe_id = st.text_input("Recipe ID")
   sub_status = st.selectbox("Submission Status", ["Not Submitted", "Submitted"], index=0)
