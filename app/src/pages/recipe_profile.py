@@ -7,7 +7,7 @@ import pandas as pd
 SideBarLinks()
 
 recipe_id = st.session_state["selected_id"]
-profile_url = f"http://web-api-test:4000/cc/recipes/{recipe_id}/profile"
+profile_url = f"http://api:4000/cc/recipes/{recipe_id}/profile"
 response = requests.get(profile_url)
 
 if response.status_code == 200:
@@ -50,7 +50,7 @@ if response.status_code == 200:
     new_servings = right_column.number_input("Enter your choice of servings.", min_value=1, value=data.get("Servings", 1))
 
     if right_column.button("Adjust Servings"):
-        adjust_url = f"http://web-api-test:4000/cc/recipes/{recipe_id}/adjust"
+        adjust_url = f"http://api:4000/cc/recipes/{recipe_id}/adjust"
         adjusted_response = requests.get(adjust_url, params={"new_servings": new_servings})
         adjusted_data = adjusted_response.json()
 
