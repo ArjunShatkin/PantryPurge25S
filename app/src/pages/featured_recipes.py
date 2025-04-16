@@ -6,7 +6,7 @@ from modules.nav import SideBarLinks
 SideBarLinks()
 st.title("Featured Recipes")
 
-featured_url = "http://web-api-test:4000/cc/recipes/featured"
+featured_url = "http://api:4000/cc/recipes/featured"
 response = requests.get(featured_url)
 
 if response.status_code == 200:
