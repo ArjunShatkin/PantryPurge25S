@@ -10,12 +10,12 @@ st.write("Enter the ingredients you have on hand (comma-separated):")
 columns = st.columns(2)
 
 ingredients_column = columns[0]
-ingredients_input = ingredients_column.text_input("Ingredients", "chicken, rice, broccoli")
+ingredients_input = ingredients_column.text_input("Ingredients", "pepper, quinoa, milk")
 
 filter_column = columns[1]
 prep_time_max = filter_column.number_input("Max Preparation Time (minutes)", min_value=0, value=360)
-cuisine = filter_column.text_input("Cuisine", "")
-diet_rest = filter_column.text_input("Diet", "")
+cuisine = filter_column.text_input("Cuisine", "Indian")
+diet_rest = filter_column.text_input("Diet", "Vegan")
 
 if "search_results" not in st.session_state:
     st.session_state["search_results"] = []
