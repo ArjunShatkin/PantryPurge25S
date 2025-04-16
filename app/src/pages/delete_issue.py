@@ -6,7 +6,7 @@ from modules.nav import SideBarLinks
 SideBarLinks()
 
 with st.form("Delete Issue"):
-  issueid = st.text_input("Issue ID")
+  issueid = st.number_input("Issue ID")
   submission = st.form_submit_button("Delete Issue")
 
 if submission:
